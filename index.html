@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>紐西蘭 11 天自駕之旅 - 互動編輯行程表</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        nzblue: '#1e3a8a',
+                        nzgreen: '#047857',
+                        nzgold: '#d97706',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .bg-pattern { background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 0.75px, transparent 0.75px); background-size: 16px 16px; }
+        .preserve-newlines { white-space: pre-line; }
+    </style>
+</head>
+<body class="bg-pattern text-slate-800 min-h-screen pb-24">
+
+    <!-- Top Sticky Header -->
+    <header class="sticky top-0 z-30 bg-slate-900/95 text-white backdrop-blur-md border-b border-slate-800 shadow-lg transition-all">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white text-xl font-black shadow-md">
+                    🇳🇿
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-slate-100 flex items-center gap-2">
+                        紐西蘭 11 天自由行
+                    </h1>
+                    <p class="text-xs text-slate-400 flex items-center gap-2">
+                        <span id="current-mode-badge" class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="header-subtitle">瀏覽模式 (唯讀)</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Mode Toggle -->
+                <div class="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
+                    <button id="btn-view-mode" onclick="setEditMode(false)" class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all text-white bg-slate-700 shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-eye"></i> <span class="hidden sm:inline">瀏覽</span>
+                    </button>
+                    <button id="btn-edit-mode" onclick="setEditMode(true)" class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all text-slate-400 hover:text-white flex items-center gap-1">
+                        <i class="fa-solid fa-pen-to-square"></i> <span class="hidden sm:inline">編輯 CMS</span>
+                    </button>
+                </div>
+
+                <!-- Backup Options Dropdown Button -->
+                <button onclick="toggleDataMenu()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-all text-sm relative" title="資料備份與重置">
+                    <i class="fa-solid fa-sliders"></i>
+                </button>
+
+                <!-- Data Menu Popover -->
+                <div id="data-menu" class="hidden absolute right-4 top-14 bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-200 p-3 w-56 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider px-2 py-1">資料管理 (CMS)</div>
+                    <button onclick="exportJSON(); toggleDataMenu()" class="w-full text-left px-3 py-2 text-xs font-medium rounded-xl hover:bg-slate-100 flex items-center gap-2 text-slate-700">
+                        <i class="fa-solid fa-file-export text-teal-600"></i> 匯出行程 JSON 檔案
+                    </button>
+                    <label class="w-full text-left px-3 py-2 text-xs font-medium rounded-xl hover:bg-slate-100 flex items-center gap-2 text-slate-700 cursor-pointer">
+                        <i class="fa-solid fa-file-import text-blue-600"></i> 匯入行程 JSON 檔案
+                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="importJSON(event)">
+                    </label>
+                    <hr class="my-1 border-slate-100">
+                    <button onclick="resetData(); toggleDataMenu()" class="w-full text-left px-3 py-2 text-xs font-medium rounded-xl hover:bg-rose-50 text-rose-600 flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> 重置為預設行程
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Horizontal Scrollable Day Switcher -->
+        <div class="bg-slate-900 border-t border-slate-800 px-2 py-2">
+            <div class="max-w-4xl mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 px-2" id="day-tabs-container">
+                <!-- Day Tabs dynamically populated -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-4 mt-4 space-y-4">
+
+        <!-- Trip Overview Stats Box -->
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+            <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-emerald-600"></i>
+                    <h2 class="text-sm font-bold text-slate-700" id="current-day-title">Day 1 行程概覽</h2>
+                </div>
+                <div id="day-cost-estimate" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    預估開銷: -- NZD
+                </div>
+            </div>
+
+            <!-- Dynamic Summary Badges -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <span class="text-slate-400 block text-[10px] mb-0.5">總日數</span>
+                    <span id="stat-total-days" class="font-black text-slate-800 text-sm">11 天</span>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <span class="text-slate-400 block text-[10px] mb-0.5">當日行程數</span>
+                    <span id="stat-activities-count" class="font-black text-slate-800 text-sm">0 個項目</span>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <span class="text-slate-400 block text-[10px] mb-0.5">住宿地點</span>
+                    <span id="stat-lodging" class="font-black text-emerald-600 text-sm truncate block">未定</span>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <span class="text-slate-400 block text-[10px] mb-0.5">預估車程/距離</span>
+                    <span id="stat-drive-time" class="font-black text-indigo-600 text-sm truncate block">約 -- km</span>
+                </div>
+            </div>
+
+            <!-- Filter Categories (View Mode only) -->
+            <div id="category-filter-container" class="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100 overflow-x-auto no-scrollbar">
+                <span class="text-xs text-slate-400 font-medium whitespace-nowrap mr-1">篩選:</span>
+                <button onclick="setCategoryFilter('all')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 text-white shadow-sm transition-all whitespace-nowrap" data-cat="all">全部</button>
+                <button onclick="setCategoryFilter('景點')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap" data-cat="景點">🏔 景點</button>
+                <button onclick="setCategoryFilter('美食')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap" data-cat="美食">🍽 美食</button>
+                <button onclick="setCategoryFilter('交通')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap" data-cat="交通">🚗 交通</button>
+                <button onclick="setCategoryFilter('住宿')" class="cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap" data-cat="住宿">🏨 住宿</button>
+            </div>
+        </section>
+
+        <!-- Edit Day Title Header Bar (Edit Mode Only) -->
+        <div id="edit-day-controls" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase text-amber-800 tracking-wider flex items-center gap-1">
+                    <i class="fa-solid fa-pen-clip"></i> 天數編輯區 (Day CMS)
+                </span>
+                <button onclick="deleteCurrentDay()" class="text-xs text-rose-600 hover:text-rose-800 font-medium px-2 py-1 rounded-lg hover:bg-rose-100/50">
+                    <i class="fa-solid fa-trash"></i> 刪除此天 (Day)
+                </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1 font-medium">天數標題 (Day Title)</label>
+                    <input type="text" id="edit-day-title-input" oninput="updateDayMetadata()" class="w-full text-sm p-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1 font-medium">住宿名稱/地點 (Lodging)</label>
+                    <input type="text" id="edit-day-hotel-input" oninput="updateDayMetadata()" class="w-full text-sm p-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="例如：Tekapo Lakefront Resort">
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Container -->
+        <section id="timeline-container" class="relative pl-3 sm:pl-6 space-y-6">
+            <!-- Dynamic Items Injection -->
+        </section>
+
+        <!-- Add Activity Button (Visible in Edit Mode) -->
+        <div id="add-item-bar" class="hidden pt-4 pb-8 text-center">
+            <button onclick="addNewActivity()" class="w-full py-3.5 border-2 border-dashed border-emerald-400 bg-emerald-50/50 hover:bg-emerald-100/50 text-emerald-700 font-bold text-sm rounded-2xl flex items-center justify-center gap-2 transition-all shadow-sm">
+                <i class="fa-solid fa-circle-plus text-base"></i> 新增行程項目 (+ Add Item)
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Floating Action Button for Quick Adding Activity in Edit Mode -->
+    <button id="fab-add" onclick="addNewActivity()" class="hidden fixed bottom-6 right-6 w-14 h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-2xl flex items-center justify-center text-xl z-40 transition-transform active:scale-95">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- English Phrase Prompt Fullscreen Modal -->
+    <div id="phrase-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-5 relative border border-slate-100 animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">💬</span>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base" id="phrase-modal-title">實用英文對話例句</h3>
+                        <p class="text-[11px] text-slate-400">點擊朗讀直接播放給外籍人員聽，或點擊複製</p>
+                    </div>
+                </div>
+                <button onclick="closePhraseModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- List of Phrases -->
+            <div id="phrase-modal-list" class="overflow-y-auto space-y-3 pr-1 flex-1">
+                <!-- Dynamic injection of phrase cards -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2.5 rounded-full shadow-2xl text-xs font-medium z-50 transition-all opacity-0 pointer-events-none flex items-center gap-2 border border-slate-700">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg">提示訊息</span>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // Default Initial 11-Day New Zealand Itinerary Data with Multiple Phrases and Attachments
+        const DEFAULT_ITINERARY = {
+            days: [
+                {
+                    dayNum: 1,
+                    title: "基督城抵達與市區探索",
+                    lodging: "Novotel Christchurch Cathedral Square",
+                    items: [
+                        { 
+                            id: "101", 
+                            time: "09:30", 
+                            category: "交通", 
+                            title: "抵達基督城國際機場 (CHC)", 
+                            notes: "領取行李，預備至租車櫃檯辦理手續\n記得預先填寫紐西蘭入境申報 (NZTD)", 
+                            mapQuery: "Christchurch International Airport", 
+                            phrases: [
+                                { label: "海關申報詢問", text: "Hi, I have declared food and hiking shoes in my NZTD form." },
+                                { label: "詢問行李轉盤", text: "Excuse me, which baggage carousel is for flight NZ101?" }
+                            ],
+                            attachments: [
+                                { type: "link", name: "紐西蘭入境申報 NZTD 官網", url: "https://www.nztd.govt.nz/" },
+                                { type: "link", name: "基督城機場平面地圖", url: "https://www.christchurchairport.co.nz/" }
+                            ],
+                            estCost: 0 
+                        },
+                        { 
+                            id: "102", 
+                            time: "11:00", 
+                            category: "交通", 
+                            title: "Apex / Hertz 租車公司領車", 
+                            notes: "檢查車身刮痕、確認保險內容與兒童座椅/雪鍊", 
+                            mapQuery: "Apex Car Rentals Christchurch Airport", 
+                            phrases: [
+                                { label: "取車核對", text: "Hi, I am here to pick up my rental car reserved under Wu." },
+                                { label: "確認全險 coverage", text: "Could you please confirm if full cover insurance zero excess is included?" },
+                                { label: "詢問加油規格", text: "Does this car take Unleaded 91 or 95 petrol?" }
+                            ],
+                            attachments: [
+                                { type: "link", name: "紐西蘭自駕交規教學 (AA NZ)", url: "https://www.aa.co.nz/drivers/driving-school-and-training/visiting-driver/" }
+                            ],
+                            estCost: 450 
+                        },
+                        { 
+                            id: "103", 
+                            time: "12:30", 
+                            category: "美食", 
+                            title: "C4 Coffee 午餐與精緻咖啡", 
+                            notes: "紐西蘭著名精品咖啡，推薦點 Flat White 與特製早午餐", 
+                            mapQuery: "C4 Coffee Christchurch", 
+                            phrases: [
+                                { label: "點餐與咖啡", text: "Could we get two Flat Whites with oat milk and the lunch menu, please?" },
+                                { label: "結帳詢問", text: "Can we pay separately or together?" }
+                            ],
+                            attachments: [],
+                            estCost: 45 
+                        },
+                        { 
+                            id: "104", 
+                            time: "14:30", 
+                            category: "景點", 
+                            title: "紙教堂 (Cardboard Cathedral) & 追憶橋", 
+                            notes: "參觀震後重建的特色紙教堂與雅芳河畔漫步", 
+                            mapQuery: "Cardboard Cathedral Christchurch", 
+                            phrases: [
+                                { label: "開放時間詢問", text: "Excuse me, what time does the cathedral close today?" }
+                            ],
+                            attachments: [],
+                            estCost: 0 
+                        },
+                        { 
+                            id: "105", 
+                            time: "18:00", 
+                            category: "住宿", 
+                            title: "Novotel 飯店 Check-in & 市區晚餐", 
+                            notes: "入住市中心飯店，準備明日開往蒂卡波湖", 
+                            mapQuery: "Novotel Christchurch Cathedral Square", 
+                            phrases: [
+                                { label: "辦理入住", text: "Hi, we have a reservation for tonight under Wu." },
+                                { label: "停車位置詢問", text: "Where is the guest parking area located?" }
+                            ],
+                            attachments: [],
+                            estCost: 220 
+                        }
+                    ]
+                },
+                {
+                    dayNum: 2,
+                    title: "基督城 ➔ 蒂卡波湖 (Lake Tekapo) 夢幻藍湖",
+                    lodging: "Peppers Bluewater Resort Tekapo",
+                    items: [
+                        { 
+                            id: "201", 
+                            time: "08:30", 
+                            category: "交通", 
+                            title: "出發開往 Lake Tekapo", 
+                            notes: "車程約 3 小時 15 分鐘，沿途景色寬廣，注意速限 100 km/h", 
+                            mapQuery: "Lake Tekapo", 
+                            phrases: [
+                                { label: "加油站地點", text: "Where is the nearest gas station along Highway 79?" }
+                            ],
+                            attachments: [],
+                            estCost: 60 
+                        },
+                        { 
+                            id: "202", 
+                            time: "12:00", 
+                            category: "美食", 
+                            title: "Fairlie Bakehouse 吃超人氣肉餅", 
+                            notes: "紐西蘭第一肉餅店！推薦鮭魚鮮蝦餅或豬腳起司餅", 
+                            mapQuery: "Fairlie Bakehouse", 
+                            phrases: [
+                                { label: "點肉餅", text: "Could I have one Pork & Apple pie and one Salmon pie, please?" }
+                            ],
+                            attachments: [],
+                            estCost: 25 
+                        },
+                        { 
+                            id: "203", 
+                            time: "14:30", 
+                            category: "景點", 
+                            title: "好牧羊人教堂 (Church of the Good Shepherd)", 
+                            notes: "湖畔經典石造教堂，拍蒂卡波牛奶藍湖景", 
+                            mapQuery: "Church of the Good Shepherd Tekapo", 
+                            phrases: [
+                                { label: "合照請託", text: "Could you take a photo of us with the lake in the background, please?" }
+                            ],
+                            attachments: [],
+                            estCost: 0 
+                        },
+                        { 
+                            id: "204", 
+                            time: "21:30", 
+                            category: "景點", 
+                            title: "Tekapo 觀星體驗 (Dark Sky Project)", 
+                            notes: "世界級暗空保護區，觀賞銀河與南十字星\n需提早 15 分鐘至遊客中心報到", 
+                            mapQuery: "Dark Sky Project Tekapo", 
+                            phrases: [
+                                { label: "觀星報到", text: "Hi, we booked the 9:30 PM stargazing tour under Wu." },
+                                { label: "防寒保暖詢問", text: "Is it cold up on the mountain? Should we wear heavy jackets?" }
+                            ],
+                            attachments: [
+                                { type: "link", name: "Dark Sky Project 觀星預約官網", url: "https://www.darkskyproject.co.nz/" }
+                            ],
+                            estCost: 180 
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // App State
+        let itineraryData = null;
+        let currentDayIndex = 0;
+        // 只有網址帶有 ?edit=1 時才開啟編輯模式；一般分享網址維持唯讀。
+        const EDITOR_ACCESS = new URLSearchParams(window.location.search).get('edit') === '1';
+        let isEditMode = EDITOR_ACCESS;
+        let activeCategoryFilter = 'all';
+
+        // LocalStorage Key
+        const STORAGE_KEY = 'NZ_TRAVEL_ITINERARY_CMS_DATA_V2';
+
+        // Initialization
+        window.onload = async function() {
+            await loadData();
+            renderApp();
+
+            // 一般分享網址是唯讀；只有加上 ?edit=1 的網址才顯示 CMS 控制。
+            if (!EDITOR_ACCESS) {
+                const editButton = document.getElementById('btn-edit-mode');
+                const dataMenuButton = document.querySelector('button[onclick="toggleDataMenu()"]');
+                if (editButton) editButton.classList.add('hidden');
+                if (dataMenuButton) dataMenuButton.classList.add('hidden');
+                const menu = document.getElementById('data-menu');
+                if (menu) menu.classList.add('hidden');
+            }
+        };
+
+        // 資料載入規則：
+        // 編輯網址 (?edit=1)：優先載入這台電腦的 localStorage。
+        // 一般分享網址：載入 GitHub Pages 同目錄的 itinerary.json，讓手機/其他裝置看到已發布資料。
+        async function loadData() {
+            const normalizeData = (data) => {
+                if (!data || !Array.isArray(data.days)) throw new Error("行程 JSON 格式不正確");
+                data.days.forEach(day => {
+                    if (!Array.isArray(day.items)) day.items = [];
+                    day.items.forEach(item => {
+                        if (!Array.isArray(item.phrases)) {
+                            item.phrases = item.englishPhrase ? [{ label: "通用情境", text: item.englishPhrase }] : [];
+                        }
+                        if (!Array.isArray(item.attachments)) item.attachments = [];
+                    });
+                });
+                return data;
+            };
+
+            if (EDITOR_ACCESS) {
+                try {
+                    const saved = localStorage.getItem(STORAGE_KEY);
+                    if (saved) {
+                        itineraryData = normalizeData(JSON.parse(saved));
+                        return;
+                    }
+                } catch (e) {
+                    console.error("無法讀取本機編輯資料：", e);
+                }
+            }
+
+            try {
+                const response = await fetch('./itinerary.json?v=' + Date.now(), { cache: 'no-store' });
+                if (!response.ok) throw new Error('找不到 itinerary.json');
+                itineraryData = normalizeData(await response.json());
+
+                // 編輯模式第一次開啟時，將已發布資料複製到本機，之後編輯不會直接改動公開版本。
+                if (EDITOR_ACCESS && !localStorage.getItem(STORAGE_KEY)) {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData));
+                }
+            } catch (e) {
+                console.warn("無法載入已發布的 itinerary.json，改用內建預設行程：", e);
+                itineraryData = JSON.parse(JSON.stringify(DEFAULT_ITINERARY));
+                if (EDITOR_ACCESS) {
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData)); } catch (_) {}
+                }
+            }
+        }
+
+        // Save data to LocalStorage
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData));
+            } catch (e) {
+                showToast("儲存失敗：附件檔案可能過大超出瀏覽器容量", true);
+            }
+        }
+
+        // Reset to Default Data
+        function resetData() {
+            if (confirm("確定要重置所有行程嗎？您自己修改的內容將會被回復為預設值。")) {
+                itineraryData = JSON.parse(JSON.stringify(DEFAULT_ITINERARY));
+                currentDayIndex = 0;
+                saveData();
+                renderApp();
+                showToast("已成功重置為預設行程！");
+            }
+        }
+
+        // Main Render Loop
+        function renderApp() {
+            renderDayTabs();
+            renderDayHeader();
+            renderTimeline();
+            updateModeUI();
+        }
+
+        // Render Top Day Selector Tabs
+        function renderDayTabs() {
+            const container = document.getElementById('day-tabs-container');
+            container.innerHTML = '';
+
+            itineraryData.days.forEach((day, index) => {
+                const isActive = index === currentDayIndex;
+                const btn = document.createElement('button');
+                btn.onclick = () => {
+                    currentDayIndex = index;
+                    renderApp();
+                };
+                btn.className = `px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                    isActive 
+                        ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' 
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }`;
+                btn.innerHTML = `<span>Day ${day.dayNum}</span>`;
+                container.appendChild(btn);
+            });
+
+            // If in Edit Mode, append an "+ Add Day" button
+            if (isEditMode) {
+                const addDayBtn = document.createElement('button');
+                addDayBtn.onclick = addNewDay;
+                addDayBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-all flex items-center gap-1';
+                addDayBtn.innerHTML = `<i class="fa-solid fa-plus"></i> 加天數`;
+                container.appendChild(addDayBtn);
+            }
+        }
+
+        // Render Day Stats and Info Overview
+        function renderDayHeader() {
+            if (!itineraryData.days[currentDayIndex]) {
+                currentDayIndex = 0;
+            }
+            const currentDay = itineraryData.days[currentDayIndex];
+
+            document.getElementById('current-day-title').innerText = `Day ${currentDay.dayNum}: ${currentDay.title || '自訂行程'}`;
+            document.getElementById('stat-total-days').innerText = `${itineraryData.days.length} 天`;
+            document.getElementById('stat-activities-count').innerText = `${currentDay.items.length} 個項目`;
+            document.getElementById('stat-lodging').innerText = currentDay.lodging || '未指定住宿';
+
+            // Calculate estimated costs
+            const totalCost = currentDay.items.reduce((sum, item) => sum + (parseFloat(item.estCost) || 0), 0);
+            document.getElementById('day-cost-estimate').innerText = `當日開銷: ~$${totalCost} NZD`;
+
+            // Calculate drive estimate badge
+            const driveItemsCount = currentDay.items.filter(i => i.category === '交通').length;
+            document.getElementById('stat-drive-time').innerText = driveItemsCount > 0 ? `約 ${driveItemsCount * 60} km` : '市區活動';
+
+            // Fill Edit Mode input fields
+            document.getElementById('edit-day-title-input').value = currentDay.title || '';
+            document.getElementById('edit-day-hotel-input').value = currentDay.lodging || '';
+        }
+
+        // Update Day Metadata in Edit Mode
+        function updateDayMetadata() {
+            const currentDay = itineraryData.days[currentDayIndex];
+            currentDay.title = document.getElementById('edit-day-title-input').value;
+            currentDay.lodging = document.getElementById('edit-day-hotel-input').value;
+            saveData();
+            document.getElementById('current-day-title').innerText = `Day ${currentDay.dayNum}: ${currentDay.title}`;
+            document.getElementById('stat-lodging').innerText = currentDay.lodging || '未指定住宿';
+        }
+
+        // Render Timeline Cards
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = '';
+
+            const currentDay = itineraryData.days[currentDayIndex];
+            if (!currentDay || !currentDay.items || currentDay.items.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400 bg-white rounded-2xl border border-slate-200/80 p-6">
+                        <i class="fa-solid fa-map-location-dot text-4xl mb-3 text-slate-300"></i>
+                        <p class="text-sm font-medium">今天尚未安排任何行程</p>
+                        ${isEditMode ? '<button onclick="addNewActivity()" class="mt-3 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold">+ 新增第一項行程</button>' : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            // Filter items by category
+            const filteredItems = currentDay.items.filter(item => {
+                if (activeCategoryFilter === 'all') return true;
+                return item.category === activeCategoryFilter;
+            });
+
+            if (filteredItems.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 bg-white rounded-2xl border border-slate-200/80">
+                        <p class="text-xs">此分類（${activeCategoryFilter}）暫無行程項目</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredItems.forEach((item, index) => {
+                const originalIndex = currentDay.items.indexOf(item);
+                const card = document.createElement('div');
+                card.className = 'relative group transition-all';
+
+                // Category badge styling map
+                const catStyles = {
+                    '景點': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                    '美食': 'bg-amber-50 text-amber-700 border-amber-200',
+                    '交通': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                    '住宿': 'bg-blue-50 text-blue-700 border-blue-200'
+                };
+                const badgeStyle = catStyles[item.category] || 'bg-slate-50 text-slate-700 border-slate-200';
+
+                // Icons map
+                const catIcons = {
+                    '景點': 'fa-mountain-sun',
+                    '美食': 'fa-utensils',
+                    '交通': 'fa-car',
+                    '住宿': 'fa-hotel'
+                };
+                const iconClass = catIcons[item.category] || 'fa-location-dot';
+
+                if (isEditMode) {
+                    // EDIT MODE CARD TEMPLATE
+                    card.innerHTML = `
+                        <div class="bg-amber-50/40 border-2 border-amber-300/80 rounded-2xl p-4 shadow-sm space-y-3 relative">
+                            <!-- Header Bar -->
+                            <div class="flex items-center justify-between border-b border-amber-200/60 pb-2">
+                                <span class="text-xs font-black text-amber-800 bg-amber-200 px-2 py-0.5 rounded-md">
+                                    #${originalIndex + 1} 行程項目編輯
+                                </span>
+                                <div class="flex items-center gap-1">
+                                    <button onclick="moveActivity(${originalIndex}, -1)" ${originalIndex === 0 ? 'disabled class="opacity-30 text-slate-400 p-1"' : 'class="p-1 hover:bg-amber-200 text-amber-800 rounded"'} title="上移">
+                                        <i class="fa-solid fa-arrow-up"></i>
+                                    </button>
+                                    <button onclick="moveActivity(${originalIndex}, 1)" ${originalIndex === currentDay.items.length - 1 ? 'disabled class="opacity-30 text-slate-400 p-1"' : 'class="p-1 hover:bg-amber-200 text-amber-800 rounded"'} title="下移">
+                                        <i class="fa-solid fa-arrow-down"></i>
+                                    </button>
+                                    <button onclick="deleteActivity(${originalIndex})" class="p-1 hover:bg-rose-100 text-rose-600 rounded ml-2" title="刪除此項">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Inputs Grid -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block text-[11px] text-slate-500 font-bold mb-0.5">時間 (Time)</label>
+                                    <input type="text" value="${escapeHtml(item.time || '')}" oninput="updateActivityField(${originalIndex}, 'time', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300 font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-slate-500 font-bold mb-0.5">分類 (Category)</label>
+                                    <select onchange="updateActivityField(${originalIndex}, 'category', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300">
+                                        <option value="景點" ${item.category === '景點' ? 'selected' : ''}>🏔 景點</option>
+                                        <option value="美食" ${item.category === '美食' ? 'selected' : ''}>🍽 美食</option>
+                                        <option value="交通" ${item.category === '交通' ? 'selected' : ''}>🚗 交通</option>
+                                        <option value="住宿" ${item.category === '住宿' ? 'selected' : ''}>🏨 住宿</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-slate-500 font-bold mb-0.5">預估費用 (NZD)</label>
+                                    <input type="number" value="${item.estCost || 0}" oninput="updateActivityField(${originalIndex}, 'estCost', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] text-slate-500 font-bold mb-0.5">行程名稱 (Title)</label>
+                                <input type="text" value="${escapeHtml(item.title || '')}" oninput="updateActivityField(${originalIndex}, 'title', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300 font-bold">
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] text-slate-500 font-bold mb-0.5">備註與說明 (支援換行)</label>
+                                <textarea oninput="updateActivityField(${originalIndex}, 'notes', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300 h-20">${escapeHtml(item.notes || '')}</textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] text-slate-500 font-bold mb-0.5">Google 地圖搜尋名稱/地標</label>
+                                <input type="text" value="${escapeHtml(item.mapQuery || '')}" oninput="updateActivityField(${originalIndex}, 'mapQuery', this.value)" class="w-full text-xs p-2 rounded-xl border border-slate-300" placeholder="例如: Fairlie Bakehouse">
+                            </div>
+
+                            <!-- Multiple English Phrases Section (CMS) -->
+                            <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-100 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-indigo-800 flex items-center gap-1">
+                                        <i class="fa-solid fa-comment-dots"></i> 實用英文對話/情境例句 (多句)
+                                    </span>
+                                    <button onclick="addPhraseToActivity(${originalIndex})" class="text-[11px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-lg hover:bg-indigo-700 transition-all">
+                                        + 新增例句
+                                    </button>
+                                </div>
+                                <div class="space-y-2" id="phrases-editor-${originalIndex}">
+                                    ${renderPhrasesEditor(originalIndex, item.phrases || [])}
+                                </div>
+                            </div>
+
+                            <!-- Attachments CMS Section (Links / File Upload) -->
+                            <div class="bg-slate-100/70 p-3 rounded-xl border border-slate-200 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-700 flex items-center gap-1">
+                                        <i class="fa-solid fa-paperclip"></i> 附件管理 (網址連結 / 電子票券 / 檔案)
+                                    </span>
+                                    <div class="flex gap-1">
+                                        <button onclick="addLinkAttachment(${originalIndex})" class="text-[11px] font-bold bg-slate-700 text-white px-2 py-0.5 rounded-lg hover:bg-slate-800 transition-all">
+                                            + 網址連結
+                                        </button>
+                                        <label class="text-[11px] font-bold bg-teal-600 text-white px-2 py-0.5 rounded-lg hover:bg-teal-700 transition-all cursor-pointer">
+                                            + 上傳檔案
+                                            <input type="file" class="hidden" onchange="uploadFileAttachment(${originalIndex}, event)">
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="space-y-1.5" id="attachments-editor-${originalIndex}">
+                                    ${renderAttachmentsEditor(originalIndex, item.attachments || [])}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // VIEW MODE CARD TEMPLATE
+                    const mapUrl = item.mapQuery ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}` : '#';
+                    const phraseCount = (item.phrases || []).length;
+                    const attachmentCount = (item.attachments || []).length;
+
+                    card.innerHTML = `
+                        <!-- Left Timeline Node Line -->
+                        <div class="absolute -left-3 sm:-left-6 top-6 bottom-0 w-0.5 bg-slate-200"></div>
+                        <div class="absolute -left-[17px] sm:-left-[29px] top-5 w-6 h-6 rounded-full bg-white border-2 border-emerald-500 text-emerald-600 flex items-center justify-center text-[10px] shadow-sm z-10">
+                            <i class="fa-solid ${iconClass}"></i>
+                        </div>
+
+                        <!-- Card Main Container -->
+                        <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80 hover:shadow-md transition-all">
+                            <!-- Time & Category Row -->
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-black font-mono text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg">
+                                        <i class="fa-regular fa-clock text-slate-400 mr-1"></i>${escapeHtml(item.time || '未訂')}
+                                    </span>
+                                    <span class="text-xs font-bold px-2.5 py-1 rounded-lg border ${badgeStyle}">
+                                        ${escapeHtml(item.category)}
+                                    </span>
+                                </div>
+                                ${item.estCost ? `<span class="text-xs text-slate-400 font-medium">$${item.estCost} NZD</span>` : ''}
+                            </div>
+
+                            <!-- Title -->
+                            <h3 class="text-base font-bold text-slate-800 mb-1.5 leading-snug">
+                                ${escapeHtml(item.title)}
+                            </h3>
+
+                            <!-- Notes with preserve-newlines -->
+                            ${item.notes ? `<p class="text-xs text-slate-600 mb-3 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100 leading-relaxed preserve-newlines">${escapeHtml(item.notes)}</p>` : ''}
+
+                            <!-- View Mode Attachments Chips Container -->
+                            ${attachmentCount > 0 ? `
+                                <div class="mb-3 space-y-1">
+                                    <div class="text-[11px] font-bold text-slate-400">📎 附件與相關連結:</div>
+                                    <div class="flex flex-wrap gap-2">
+                                        ${item.attachments.map(att => `
+                                            <a href="${att.url || att.data}" target="_blank" rel="noopener noreferrer" download="${att.type === 'file' ? att.name : ''}" class="inline-flex items-center gap-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-xl border border-slate-200 transition-all font-medium">
+                                                <i class="fa-solid ${att.type === 'link' ? 'fa-link text-blue-500' : 'fa-file-pdf text-rose-500'}"></i>
+                                                <span class="truncate max-w-[180px]">${escapeHtml(att.name)}</span>
+                                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
+                                            </a>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Action Buttons Row -->
+                            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 flex-wrap">
+                                ${item.mapQuery ? `
+                                    <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-blue-200/60">
+                                        <i class="fa-solid fa-map-location-dot text-blue-600"></i> 開地圖
+                                    </a>
+                                ` : ''}
+
+                                ${phraseCount > 0 ? `
+                                    <button onclick="openPhraseModalForActivity(${originalIndex})" class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-indigo-200/60">
+                                        <i class="fa-solid fa-comment-dots text-indigo-600"></i> 英文對話 (${phraseCount} 句)
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        // Helper: Render Phrases Editor in CMS
+        function renderPhrasesEditor(actIndex, phrases) {
+            if (!phrases || phrases.length === 0) {
+                return `<div class="text-[11px] text-indigo-400 italic">尚無對話例句，點擊「+ 新增例句」即可加入</div>`;
+            }
+
+            return phrases.map((p, pIdx) => `
+                <div class="bg-white p-2 rounded-lg border border-indigo-100 space-y-1">
+                    <div class="flex items-center justify-between gap-2">
+                        <input type="text" value="${escapeHtml(p.label || '')}" placeholder="情境/情節名稱 (如: 詢問保險)" oninput="updatePhraseField(${actIndex}, ${pIdx}, 'label', this.value)" class="text-xs p-1 rounded border border-slate-200 font-bold text-indigo-900 w-1/3">
+                        <button onclick="removePhraseFromActivity(${actIndex}, ${pIdx})" class="text-rose-500 hover:text-rose-700 text-xs p-1">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <textarea placeholder="英文例句內容..." oninput="updatePhraseField(${actIndex}, ${pIdx}, 'text', this.value)" class="w-full text-xs p-1.5 rounded border border-slate-200 h-12">${escapeHtml(p.text || '')}</textarea>
+                </div>
+            `).join('');
+        }
+
+        // Helper: Render Attachments Editor in CMS
+        function renderAttachmentsEditor(actIndex, attachments) {
+            if (!attachments || attachments.length === 0) {
+                return `<div class="text-[11px] text-slate-400 italic">尚無附件或連結，可上方新增網址或上傳檔案</div>`;
+            }
+
+            return attachments.map((att, attIdx) => `
+                <div class="flex items-center justify-between bg-white p-2 rounded-lg border border-slate-200 text-xs gap-2">
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <i class="fa-solid ${att.type === 'link' ? 'fa-link text-blue-500' : 'fa-file-lines text-teal-500'}"></i>
+                        <input type="text" value="${escapeHtml(att.name || '')}" placeholder="附件/連結標題" oninput="updateAttachmentName(${actIndex}, ${attIdx}, this.value)" class="text-xs p-1 rounded border border-slate-200 font-bold flex-1">
+                        ${att.type === 'link' ? `
+                            <input type="text" value="${escapeHtml(att.url || '')}" placeholder="https://..." oninput="updateAttachmentUrl(${actIndex}, ${attIdx}, this.value)" class="text-xs p-1 rounded border border-slate-200 flex-1">
+                        ` : `<span class="text-[10px] text-slate-400">[檔案已就緒]</span>`}
+                    </div>
+                    <button onclick="removeAttachmentFromActivity(${actIndex}, ${attIdx})" class="text-rose-500 hover:text-rose-700 p-1">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Phrase CMS actions
+        function addPhraseToActivity(actIndex) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (!item.phrases) item.phrases = [];
+            item.phrases.push({ label: "新對話情境", text: "How much does this cost?" });
+            saveData();
+            renderTimeline();
+        }
+
+        function updatePhraseField(actIndex, phraseIndex, field, value) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (item && item.phrases && item.phrases[phraseIndex]) {
+                item.phrases[phraseIndex][field] = value;
+                saveData();
+            }
+        }
+
+        function removePhraseFromActivity(actIndex, phraseIndex) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (item && item.phrases) {
+                item.phrases.splice(phraseIndex, 1);
+                saveData();
+                renderTimeline();
+            }
+        }
+
+        // Attachment CMS actions
+        function addLinkAttachment(actIndex) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (!item.attachments) item.attachments = [];
+            item.attachments.push({ type: 'link', name: '預約確認連結/網頁', url: 'https://' });
+            saveData();
+            renderTimeline();
+        }
+
+        function uploadFileAttachment(actIndex, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast("檔案建議小於 5MB 以確保儲存順暢", true);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const item = itineraryData.days[currentDayIndex].items[actIndex];
+                if (!item.attachments) item.attachments = [];
+                item.attachments.push({
+                    type: 'file',
+                    name: file.name,
+                    data: e.target.result
+                });
+                saveData();
+                renderTimeline();
+                showToast("檔案已成功附加！");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateAttachmentName(actIndex, attIndex, value) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (item && item.attachments && item.attachments[attIndex]) {
+                item.attachments[attIndex].name = value;
+                saveData();
+            }
+        }
+
+        function updateAttachmentUrl(actIndex, attIndex, value) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (item && item.attachments && item.attachments[attIndex]) {
+                item.attachments[attIndex].url = value;
+                saveData();
+            }
+        }
+
+        function removeAttachmentFromActivity(actIndex, attIndex) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (item && item.attachments) {
+                item.attachments.splice(attIndex, 1);
+                saveData();
+                renderTimeline();
+            }
+        }
+
+        // Open Phrases Modal for Activity
+        function openPhraseModalForActivity(actIndex) {
+            const item = itineraryData.days[currentDayIndex].items[actIndex];
+            if (!item || !item.phrases || item.phrases.length === 0) return;
+
+            document.getElementById('phrase-modal-title').innerText = `${item.title} - 實用對話 (${item.phrases.length} 句)`;
+            const listContainer = document.getElementById('phrase-modal-list');
+            listContainer.innerHTML = '';
+
+            item.phrases.forEach((p, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-gradient-to-br from-indigo-50/70 to-blue-50/70 rounded-2xl p-4 border border-indigo-100 space-y-3";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-indigo-100/80 pb-2">
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-100/80 px-2.5 py-0.5 rounded-md">
+                            💡 ${escapeHtml(p.label || '對話情境')}
+                        </span>
+                        <span class="text-[11px] text-slate-400">#${idx + 1}</span>
+                    </div>
+                    <p class="text-lg sm:text-xl font-black text-slate-900 tracking-wide leading-relaxed select-all">
+                        "${escapeHtml(p.text)}"
+                    </p>
+                    <div class="flex items-center gap-2 pt-1">
+                        <button onclick="speakText('${escapeHtml(p.text)}')" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95">
+                            <i class="fa-solid fa-volume-high"></i> 朗讀聲音
+                        </button>
+                        <button onclick="copyTextToClipboard('${escapeHtml(p.text)}')" class="flex-1 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-200 transition-all active:scale-95">
+                            <i class="fa-solid fa-copy"></i> 複製文字
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+
+            document.getElementById('phrase-modal').classList.remove('hidden');
+        }
+
+        function closePhraseModal() {
+            document.getElementById('phrase-modal').classList.add('hidden');
+        }
+
+        // TTS & Copy Helpers
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+                showToast("🔊 正在發音朗讀...");
+            } else {
+                showToast("您的瀏覽器不支援語音朗讀", true);
+            }
+        }
+
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast("已複製英文對話至剪貼簿！");
+                }).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast("已複製英文對話至剪貼簿！");
+        }
+
+        // Toggle Edit Mode
+        function setEditMode(enable) {
+            if (enable && !EDITOR_ACCESS) {
+                showToast("此網址為唯讀模式。請使用你的編輯網址。", true);
+                return;
+            }
+            isEditMode = enable;
+            saveData();
+            renderApp();
+            showToast(isEditMode ? "已切換至「編輯 CMS 模式」" : "已切換至「瀏覽模式」");
+        }
+
+        // Update Toggle Buttons UI
+        function updateModeUI() {
+            const btnView = document.getElementById('btn-view-mode');
+            const btnEdit = document.getElementById('btn-edit-mode');
+            const subtitle = document.getElementById('header-subtitle');
+            const editControls = document.getElementById('edit-day-controls');
+            const addItemBar = document.getElementById('add-item-bar');
+            const fab = document.getElementById('fab-add');
+            const catFilters = document.getElementById('category-filter-container');
+
+            if (isEditMode) {
+                btnView.className = 'px-2.5 py-1 text-xs font-medium rounded-lg transition-all text-slate-400 hover:text-white flex items-center gap-1';
+                btnEdit.className = 'px-2.5 py-1 text-xs font-medium rounded-lg transition-all text-white bg-amber-600 shadow-sm flex items-center gap-1';
+                subtitle.innerText = "編輯模式 (可即時修改)";
+                document.getElementById('current-mode-badge').className = "inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping";
+
+                editControls.classList.remove('hidden');
+                addItemBar.classList.remove('hidden');
+                fab.classList.remove('hidden');
+                catFilters.classList.add('hidden');
+            } else {
+                btnView.className = 'px-2.5 py-1 text-xs font-medium rounded-lg transition-all text-white bg-slate-700 shadow-sm flex items-center gap-1';
+                btnEdit.className = 'px-2.5 py-1 text-xs font-medium rounded-lg transition-all text-slate-400 hover:text-white flex items-center gap-1';
+                subtitle.innerText = "瀏覽模式 (唯讀)";
+                document.getElementById('current-mode-badge').className = "inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+
+                editControls.classList.add('hidden');
+                addItemBar.classList.add('hidden');
+                fab.classList.add('hidden');
+                catFilters.classList.remove('hidden');
+            }
+        }
+
+        // Category Filter Function
+        function setCategoryFilter(category) {
+            activeCategoryFilter = category;
+            document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-cat') === category) {
+                    btn.className = 'cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 text-white shadow-sm transition-all whitespace-nowrap';
+                } else {
+                    btn.className = 'cat-filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap';
+                }
+            });
+            renderTimeline();
+        }
+
+        // Add New Activity Item
+        function addNewActivity() {
+            const currentDay = itineraryData.days[currentDayIndex];
+            const newItem = {
+                id: Date.now().toString(),
+                time: "12:00",
+                category: "景點",
+                title: "新行程項目",
+                notes: "點擊此處輸入詳細說明...",
+                mapQuery: "",
+                phrases: [
+                    { label: "詢問處", text: "Excuse me, where is the main entrance?" }
+                ],
+                attachments: [],
+                estCost: 0
+            };
+            currentDay.items.push(newItem);
+            saveData();
+            renderApp();
+            showToast("已新增一項行程！");
+        }
+
+        // Update Specific Field in Activity
+        function updateActivityField(index, field, value) {
+            const currentDay = itineraryData.days[currentDayIndex];
+            if (currentDay && currentDay.items[index]) {
+                currentDay.items[index][field] = value;
+                saveData();
+                renderDayHeader();
+            }
+        }
+
+        // Move Activity Item Up / Down
+        function moveActivity(index, direction) {
+            const items = itineraryData.days[currentDayIndex].items;
+            const targetIndex = index + direction;
+            if (targetIndex >= 0 && targetIndex < items.length) {
+                const temp = items[index];
+                items[index] = items[targetIndex];
+                items[targetIndex] = temp;
+                saveData();
+                renderTimeline();
+            }
+        }
+
+        // Delete Activity Item
+        function deleteActivity(index) {
+            if (confirm("確定要刪除此項行程嗎？")) {
+                itineraryData.days[currentDayIndex].items.splice(index, 1);
+                saveData();
+                renderApp();
+                showToast("行程已刪除");
+            }
+        }
+
+        // Add Entire New Day
+        function addNewDay() {
+            const newDayNum = itineraryData.days.length + 1;
+            const newDay = {
+                dayNum: newDayNum,
+                title: `第 ${newDayNum} 天行程`,
+                lodging: "自訂住宿地點",
+                items: [
+                    {
+                        id: Date.now().toString(),
+                        time: "09:00",
+                        category: "景點",
+                        title: "展開精彩一日探險",
+                        notes: "在此輸入今天的行程概要",
+                        mapQuery: "New Zealand",
+                        phrases: [{ label: "問候", text: "Good morning!" }],
+                        attachments: [],
+                        estCost: 0
+                    }
+                ]
+            };
+            itineraryData.days.push(newDay);
+            currentDayIndex = itineraryData.days.length - 1;
+            saveData();
+            renderApp();
+            showToast(`已新增 Day ${newDayNum}！`);
+        }
+
+        // Delete Entire Current Day
+        function deleteCurrentDay() {
+            if (itineraryData.days.length <= 1) {
+                showToast("至少需保留一天行程！", true);
+                return;
+            }
+            if (confirm(`確定要刪除整個 Day ${itineraryData.days[currentDayIndex].dayNum} 嗎？`)) {
+                itineraryData.days.splice(currentDayIndex, 1);
+                itineraryData.days.forEach((day, i) => {
+                    day.dayNum = i + 1;
+                });
+                currentDayIndex = Math.max(0, currentDayIndex - 1);
+                saveData();
+                renderApp();
+                showToast("已刪除該天數");
+            }
+        }
+
+        // Popover Data Menu Toggle
+        function toggleDataMenu() {
+            const menu = document.getElementById('data-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // 匯出 JSON：固定命名 itinerary.json，方便直接上傳並取代 GitHub 上的發布資料。
+        function exportJSON() {
+            const blob = new Blob(
+                [JSON.stringify(itineraryData, null, 2)],
+                { type: "application/json;charset=utf-8" }
+            );
+            const url = URL.createObjectURL(blob);
+            const dlAnchor = document.createElement('a');
+            dlAnchor.href = url;
+            dlAnchor.download = "itinerary.json";
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            URL.revokeObjectURL(url);
+            showToast("已匯出 itinerary.json；上傳到 GitHub 取代舊檔後，手機就能看到新內容。");
+        }
+
+        // Import JSON File
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed && Array.isArray(parsed.days)) {
+                        itineraryData = parsed;
+                        currentDayIndex = 0;
+                        saveData();
+                        renderApp();
+                        showToast("成功匯入行程檔案！");
+                    } else {
+                        showToast("JSON 格式不符！", true);
+                    }
+                } catch (err) {
+                    showToast("檔案讀取失敗，請確認為合法 JSON", true);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Toast Helper
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const msgSpan = document.getElementById('toast-msg');
+            const icon = document.getElementById('toast-icon');
+
+            msgSpan.innerText = msg;
+            if (isError) {
+                icon.className = "fa-solid fa-circle-exclamation text-rose-400";
+            } else {
+                icon.className = "fa-solid fa-circle-check text-emerald-400";
+            }
+
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+
+        // Escape HTML Helper
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
