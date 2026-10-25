@@ -371,75 +371,41 @@
         // App State
         let itineraryData = null;
         let currentDayIndex = 0;
-        // 只有網址帶有 ?edit=1 時才開啟編輯模式；一般分享網址維持唯讀。
-        const EDITOR_ACCESS = new URLSearchParams(window.location.search).get('edit') === '1';
-        let isEditMode = EDITOR_ACCESS;
+        let isEditMode = false;
         let activeCategoryFilter = 'all';
 
         // LocalStorage Key
         const STORAGE_KEY = 'NZ_TRAVEL_ITINERARY_CMS_DATA_V2';
 
         // Initialization
-        window.onload = async function() {
-            await loadData();
+        window.onload = function() {
+            loadData();
             renderApp();
-
-            // 一般分享網址是唯讀；只有加上 ?edit=1 的網址才顯示 CMS 控制。
-            if (!EDITOR_ACCESS) {
-                const editButton = document.getElementById('btn-edit-mode');
-                const dataMenuButton = document.querySelector('button[onclick="toggleDataMenu()"]');
-                if (editButton) editButton.classList.add('hidden');
-                if (dataMenuButton) dataMenuButton.classList.add('hidden');
-                const menu = document.getElementById('data-menu');
-                if (menu) menu.classList.add('hidden');
-            }
         };
 
-        // 資料載入規則：
-        // 編輯網址 (?edit=1)：優先載入這台電腦的 localStorage。
-        // 一般分享網址：載入 GitHub Pages 同目錄的 itinerary.json，讓手機/其他裝置看到已發布資料。
-        async function loadData() {
-            const normalizeData = (data) => {
-                if (!data || !Array.isArray(data.days)) throw new Error("行程 JSON 格式不正確");
-                data.days.forEach(day => {
-                    if (!Array.isArray(day.items)) day.items = [];
-                    day.items.forEach(item => {
-                        if (!Array.isArray(item.phrases)) {
-                            item.phrases = item.englishPhrase ? [{ label: "通用情境", text: item.englishPhrase }] : [];
-                        }
-                        if (!Array.isArray(item.attachments)) item.attachments = [];
-                    });
-                });
-                return data;
-            };
-
-            if (EDITOR_ACCESS) {
-                try {
-                    const saved = localStorage.getItem(STORAGE_KEY);
-                    if (saved) {
-                        itineraryData = normalizeData(JSON.parse(saved));
-                        return;
-                    }
-                } catch (e) {
-                    console.error("無法讀取本機編輯資料：", e);
-                }
-            }
-
+        // Load data from LocalStorage or default
+        function loadData() {
             try {
-                const response = await fetch('./itinerary.json?v=' + Date.now(), { cache: 'no-store' });
-                if (!response.ok) throw new Error('找不到 itinerary.json');
-                itineraryData = normalizeData(await response.json());
-
-                // 編輯模式第一次開啟時，將已發布資料複製到本機，之後編輯不會直接改動公開版本。
-                if (EDITOR_ACCESS && !localStorage.getItem(STORAGE_KEY)) {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData));
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    itineraryData = JSON.parse(saved);
+                    // Migration check: ensure phrases and attachments arrays exist on all items
+                    itineraryData.days.forEach(day => {
+                        day.items.forEach(item => {
+                            if (!Array.isArray(item.phrases)) {
+                                item.phrases = item.englishPhrase ? [{ label: "通用情境", text: item.englishPhrase }] : [];
+                            }
+                            if (!Array.isArray(item.attachments)) {
+                                item.attachments = [];
+                            }
+                        });
+                    });
+                } else {
+                    itineraryData = JSON.parse(JSON.stringify(DEFAULT_ITINERARY));
                 }
             } catch (e) {
-                console.warn("無法載入已發布的 itinerary.json，改用內建預設行程：", e);
+                console.error("Failed to parse stored itinerary data:", e);
                 itineraryData = JSON.parse(JSON.stringify(DEFAULT_ITINERARY));
-                if (EDITOR_ACCESS) {
-                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData)); } catch (_) {}
-                }
             }
         }
 
@@ -910,14 +876,18 @@
                         "${escapeHtml(p.text)}"
                     </p>
                     <div class="flex items-center gap-2 pt-1">
-                        <button onclick="speakText('${escapeHtml(p.text)}')" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95">
+                        <button type="button" class="phrase-speak-btn flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95">
                             <i class="fa-solid fa-volume-high"></i> 朗讀聲音
                         </button>
-                        <button onclick="copyTextToClipboard('${escapeHtml(p.text)}')" class="flex-1 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-200 transition-all active:scale-95">
+                        <button type="button" class="phrase-copy-btn flex-1 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-200 transition-all active:scale-95">
                             <i class="fa-solid fa-copy"></i> 複製文字
                         </button>
                     </div>
                 `;
+                // Use event listeners instead of placing user-entered text inside inline JavaScript.
+                // This safely handles apostrophes, quotation marks and other special characters.
+                card.querySelector('.phrase-speak-btn').addEventListener('click', () => speakText(p.text || ''));
+                card.querySelector('.phrase-copy-btn').addEventListener('click', () => copyTextToClipboard(p.text || ''));
                 listContainer.appendChild(card);
             });
 
@@ -929,17 +899,92 @@
         }
 
         // TTS & Copy Helpers
+        let speechRunId = 0;
+
+        // Split long text into short, natural chunks to reduce browser TTS stalls.
+        function splitSpeechText(text, maxLength = 180) {
+            const cleaned = String(text || '').replace(/\s+/g, ' ').trim();
+            if (!cleaned) return [];
+
+            const sentences = cleaned.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleaned];
+            const chunks = [];
+            let current = '';
+
+            for (const rawSentence of sentences) {
+                const sentence = rawSentence.trim();
+                if (!sentence) continue;
+
+                if (sentence.length > maxLength) {
+                    if (current) {
+                        chunks.push(current);
+                        current = '';
+                    }
+                    const words = sentence.split(/\s+/);
+                    let part = '';
+                    for (const word of words) {
+                        if (part && (part + ' ' + word).length > maxLength) {
+                            chunks.push(part);
+                            part = word;
+                        } else {
+                            part = part ? part + ' ' + word : word;
+                        }
+                    }
+                    if (part) chunks.push(part);
+                } else if (!current) {
+                    current = sentence;
+                } else if ((current + ' ' + sentence).length <= maxLength) {
+                    current += ' ' + sentence;
+                } else {
+                    chunks.push(current);
+                    current = sentence;
+                }
+            }
+
+            if (current) chunks.push(current);
+            return chunks;
+        }
+
         function speakText(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
+            if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+                showToast("您的瀏覽器不支援語音朗讀", true);
+                return;
+            }
+
+            const chunks = splitSpeechText(text);
+            if (!chunks.length) {
+                showToast("沒有可朗讀的文字", true);
+                return;
+            }
+
+            const synth = window.speechSynthesis;
+            const thisRunId = ++speechRunId;
+            synth.cancel();
+            let chunkIndex = 0;
+
+            const speakNextChunk = () => {
+                if (thisRunId !== speechRunId || chunkIndex >= chunks.length) return;
+
+                const utterance = new SpeechSynthesisUtterance(chunks[chunkIndex]);
                 utterance.lang = 'en-US';
                 utterance.rate = 0.85;
-                window.speechSynthesis.speak(utterance);
-                showToast("🔊 正在發音朗讀...");
-            } else {
-                showToast("您的瀏覽器不支援語音朗讀", true);
-            }
+                utterance.onend = () => {
+                    if (thisRunId !== speechRunId) return;
+                    chunkIndex++;
+                    speakNextChunk();
+                };
+                utterance.onerror = (event) => {
+                    if (thisRunId !== speechRunId) return;
+                    // A canceled/interrupted utterance is expected when the user starts another one.
+                    if (event.error === 'canceled' || event.error === 'interrupted') return;
+                    chunkIndex++;
+                    speakNextChunk();
+                };
+                synth.speak(utterance);
+            };
+
+            // A short delay after cancel helps some browsers restart speech reliably.
+            window.setTimeout(speakNextChunk, 100);
+            showToast("🔊 正在發音朗讀...");
         }
 
         function copyTextToClipboard(text) {
@@ -964,10 +1009,6 @@
 
         // Toggle Edit Mode
         function setEditMode(enable) {
-            if (enable && !EDITOR_ACCESS) {
-                showToast("此網址為唯讀模式。請使用你的編輯網址。", true);
-                return;
-            }
             isEditMode = enable;
             saveData();
             renderApp();
@@ -1127,21 +1168,16 @@
             menu.classList.toggle('hidden');
         }
 
-        // 匯出 JSON：固定命名 itinerary.json，方便直接上傳並取代 GitHub 上的發布資料。
+        // Export JSON File
         function exportJSON() {
-            const blob = new Blob(
-                [JSON.stringify(itineraryData, null, 2)],
-                { type: "application/json;charset=utf-8" }
-            );
-            const url = URL.createObjectURL(blob);
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(itineraryData, null, 2));
             const dlAnchor = document.createElement('a');
-            dlAnchor.href = url;
-            dlAnchor.download = "itinerary.json";
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `NewZealand_Itinerary_${new Date().toISOString().slice(0,10)}.json`);
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
-            URL.revokeObjectURL(url);
-            showToast("已匯出 itinerary.json；上傳到 GitHub 取代舊檔後，手機就能看到新內容。");
+            showToast("已成功匯出 JSON 備份檔！");
         }
 
         // Import JSON File
