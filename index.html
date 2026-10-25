@@ -376,8 +376,10 @@
         let isEditMode = EDITOR_ACCESS;
         let activeCategoryFilter = 'all';
 
-        // LocalStorage Key
+        // LocalStorage keys
         const STORAGE_KEY = 'NZ_TRAVEL_ITINERARY_CMS_DATA_V2';
+        // 一般瀏覽模式用來暫存最近一次成功讀取的公開 JSON，避免網路短暫失敗就跳回預設資料。
+        const PUBLISHED_CACHE_KEY = 'NZ_TRAVEL_ITINERARY_PUBLISHED_CACHE_V1';
 
         // Initialization
         window.onload = async function() {
@@ -413,6 +415,7 @@
                 return data;
             };
 
+            // 編輯網址優先讀取這台電腦的編輯資料；這份資料不會自動同步到手機。
             if (EDITOR_ACCESS) {
                 try {
                     const saved = localStorage.getItem(STORAGE_KEY);
@@ -425,21 +428,59 @@
                 }
             }
 
-            try {
-                const response = await fetch('./itinerary.json?v=' + Date.now(), { cache: 'no-store' });
-                if (!response.ok) throw new Error('找不到 itinerary.json');
-                itineraryData = normalizeData(await response.json());
+            // 公開網址讀取 GitHub 上的 itinerary.json；失敗時重試一次。
+            let lastError = null;
+            for (let attempt = 0; attempt < 2; attempt++) {
+                try {
+                    const response = await fetch('./itinerary.json?refresh=' + Date.now() + '-' + attempt, {
+                        cache: 'no-store'
+                    });
+                    if (!response.ok) throw new Error('itinerary.json HTTP ' + response.status);
+                    const publishedData = normalizeData(await response.json());
+                    itineraryData = publishedData;
 
-                // 編輯模式第一次開啟時，將已發布資料複製到本機，之後編輯不會直接改動公開版本。
-                if (EDITOR_ACCESS && !localStorage.getItem(STORAGE_KEY)) {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData));
+                    // 保存最近一次成功的公開資料，讓手機遇到短暫連線問題時仍可顯示最新成功版本。
+                    try {
+                        localStorage.setItem(PUBLISHED_CACHE_KEY, JSON.stringify(publishedData));
+                    } catch (cacheError) {
+                        console.warn('無法暫存公開行程：', cacheError);
+                    }
+
+                    // 編輯模式第一次開啟時，複製公開資料作為本機編輯起點。
+                    if (EDITOR_ACCESS) {
+                        try {
+                            if (!localStorage.getItem(STORAGE_KEY)) {
+                                localStorage.setItem(STORAGE_KEY, JSON.stringify(publishedData));
+                            }
+                        } catch (storageError) {
+                            console.warn('無法建立本機編輯資料：', storageError);
+                        }
+                    }
+                    return;
+                } catch (e) {
+                    lastError = e;
+                    console.warn('載入 itinerary.json 失敗，第 ' + (attempt + 1) + ' 次：', e);
                 }
-            } catch (e) {
-                console.warn("無法載入已發布的 itinerary.json，改用內建預設行程：", e);
-                itineraryData = JSON.parse(JSON.stringify(DEFAULT_ITINERARY));
-                if (EDITOR_ACCESS) {
-                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData)); } catch (_) {}
+            }
+
+            // 網路失敗時先使用此裝置曾成功讀取的公開版本，不要直接切回內建預設行程。
+            try {
+                const cached = localStorage.getItem(PUBLISHED_CACHE_KEY);
+                if (cached) {
+                    itineraryData = normalizeData(JSON.parse(cached));
+                    showToast('目前連不上最新行程，先顯示此裝置上次成功載入的版本。', true);
+                    return;
                 }
+            } catch (cacheError) {
+                console.warn('公開行程快取無法讀取：', cacheError);
+            }
+
+            // 只有完全沒有公開資料快取時才使用內建預設資料，並明確提醒使用者。
+            console.error('公開行程載入失敗，且沒有可用快取：', lastError);
+            itineraryData = JSON.parse(JSON.stringify(DEFAULT_ITINERARY));
+            showToast('無法載入已發布行程，現在顯示的是內建預設資料。請確認 itinerary.json 已上傳到 GitHub。', true);
+            if (EDITOR_ACCESS) {
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData)); } catch (_) {}
             }
         }
 
@@ -910,14 +951,17 @@
                         "${escapeHtml(p.text)}"
                     </p>
                     <div class="flex items-center gap-2 pt-1">
-                        <button onclick="speakText('${escapeHtml(p.text)}')" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95">
+                        <button type="button" data-phrase-action="speak" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95">
                             <i class="fa-solid fa-volume-high"></i> 朗讀聲音
                         </button>
-                        <button onclick="copyTextToClipboard('${escapeHtml(p.text)}')" class="flex-1 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-200 transition-all active:scale-95">
+                        <button type="button" data-phrase-action="copy" class="flex-1 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-200 transition-all active:scale-95">
                             <i class="fa-solid fa-copy"></i> 複製文字
                         </button>
                     </div>
                 `;
+                // 用事件監聽器傳入原始文字，避免 I'm / don't 等單引號破壞按鈕程式碼。
+                card.querySelector('[data-phrase-action="speak"]').addEventListener('click', () => speakText(p.text || ''));
+                card.querySelector('[data-phrase-action="copy"]').addEventListener('click', () => copyTextToClipboard(p.text || ''));
                 listContainer.appendChild(card);
             });
 
@@ -929,17 +973,92 @@
         }
 
         // TTS & Copy Helpers
+        let speechRunId = 0;
+
+        // Split long text into short, natural chunks to reduce browser TTS stalls.
+        function splitSpeechText(text, maxLength = 180) {
+            const cleaned = String(text || '').replace(/\s+/g, ' ').trim();
+            if (!cleaned) return [];
+
+            const sentences = cleaned.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleaned];
+            const chunks = [];
+            let current = '';
+
+            for (const rawSentence of sentences) {
+                const sentence = rawSentence.trim();
+                if (!sentence) continue;
+
+                if (sentence.length > maxLength) {
+                    if (current) {
+                        chunks.push(current);
+                        current = '';
+                    }
+                    const words = sentence.split(/\s+/);
+                    let part = '';
+                    for (const word of words) {
+                        if (part && (part + ' ' + word).length > maxLength) {
+                            chunks.push(part);
+                            part = word;
+                        } else {
+                            part = part ? part + ' ' + word : word;
+                        }
+                    }
+                    if (part) chunks.push(part);
+                } else if (!current) {
+                    current = sentence;
+                } else if ((current + ' ' + sentence).length <= maxLength) {
+                    current += ' ' + sentence;
+                } else {
+                    chunks.push(current);
+                    current = sentence;
+                }
+            }
+
+            if (current) chunks.push(current);
+            return chunks;
+        }
+
         function speakText(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
+            if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+                showToast("您的瀏覽器不支援語音朗讀", true);
+                return;
+            }
+
+            const chunks = splitSpeechText(text);
+            if (!chunks.length) {
+                showToast("沒有可朗讀的文字", true);
+                return;
+            }
+
+            const synth = window.speechSynthesis;
+            const thisRunId = ++speechRunId;
+            synth.cancel();
+            let chunkIndex = 0;
+
+            const speakNextChunk = () => {
+                if (thisRunId !== speechRunId || chunkIndex >= chunks.length) return;
+
+                const utterance = new SpeechSynthesisUtterance(chunks[chunkIndex]);
                 utterance.lang = 'en-US';
                 utterance.rate = 0.85;
-                window.speechSynthesis.speak(utterance);
-                showToast("🔊 正在發音朗讀...");
-            } else {
-                showToast("您的瀏覽器不支援語音朗讀", true);
-            }
+                utterance.onend = () => {
+                    if (thisRunId !== speechRunId) return;
+                    chunkIndex++;
+                    speakNextChunk();
+                };
+                utterance.onerror = (event) => {
+                    if (thisRunId !== speechRunId) return;
+                    // A canceled/interrupted utterance is expected when the user starts another one.
+                    if (event.error === 'canceled' || event.error === 'interrupted') return;
+                    chunkIndex++;
+                    speakNextChunk();
+                };
+                synth.speak(utterance);
+            };
+
+            // A short delay after cancel helps some browsers restart speech reliably.
+            window.setTimeout(speakNextChunk, 100);
+            showToast("🔊 正在發音朗讀...");
         }
 
         function copyTextToClipboard(text) {
@@ -1048,7 +1167,8 @@
             if (currentDay && currentDay.items[index]) {
                 currentDay.items[index][field] = value;
                 saveData();
-                renderDayHeader();
+                // 文字欄位輸入時不要反覆重繪摘要區，避免輸入過程看起來閃動或跳動。
+                if (field === 'estCost' || field === 'category') renderDayHeader();
             }
         }
 
