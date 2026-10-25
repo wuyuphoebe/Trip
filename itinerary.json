@@ -13,7 +13,18 @@
           "notes": "準備出發！\n台北→香港\n航廈：T1\n班機：CX495 國泰航空\n機型：空中巴士 330-300",
           "mapQuery": "Taoyuan International Airport",
           "phrases": [],
-          "attachments": [],
+          "attachments": [
+            {
+              "type": "link",
+              "name": "台北飛奧克蘭_Yu",
+              "url": "https://drive.google.com/file/d/1XxgcZfZOjHhNFWoTSYjsCDLY3cUm40SU/view?usp=drive_link"
+            },
+            {
+              "type": "link",
+              "name": "台北飛奧克蘭_阿姨",
+              "url": "https://drive.google.com/file/d/1fNG69lQ0X9NxW88pbSYqCu_asXmh-qaM/view?usp=drive_link"
+            }
+          ],
           "estCost": 0
         },
         {
@@ -29,6 +40,11 @@
               "type": "link",
               "name": "香港電子簽",
               "url": "https://drive.google.com/file/d/1F2PuJYJ5Zlueaq5xXG63rFTolIBZV8il/view?usp=drive_link"
+            },
+            {
+              "type": "link",
+              "name": "香港轉機可以逛的地方",
+              "url": "https://youtu.be/YicARbQfBrE?si=hE3SipcP7_2XbwRB"
             }
           ],
           "estCost": ""
@@ -56,7 +72,7 @@
           "time": "13:25",
           "category": "交通",
           "title": "抵達奧克蘭國際機場 (AKL)",
-          "notes": "航廈：I",
+          "notes": "航廈：I\nNote：\n1. 第一關移民官: 看你的護照問你幾個問題，為麼來紐西蘭，來幾天，如果你有資料直接印下來給他看，你住的地方，去程和返程航班\n2.行李安檢: 他會問你帶什麼，有沒有帶水果、種子、鞋底有沒有泥土，如果有去健行要記得把鞋底用乾淨，如果這關拿到0，意思就是說妳的行李不用再去過X光機，也不需要打開檢查，走一個通道會有狗狗聞你行李，然後就到外面了",
           "mapQuery": "Auckland Airport",
           "phrases": [
             {
@@ -120,40 +136,92 @@
               "type": "link",
               "name": "行李清單",
               "url": "https://docs.google.com/spreadsheets/d/1o4Hz8XPOba-Zlwx4hQp6PlPTODM6CBBK/edit?usp=drive_link&ouid=112902641538693495730&rtpof=true&sd=true"
+            },
+            {
+              "type": "link",
+              "name": "紐西蘭打工度假簽證",
+              "url": "https://drive.google.com/file/d/1KTWzunspNpsISxeQ985SJGrp9GdMV2no/view?usp=drive_link"
             }
           ],
           "estCost": ""
         },
         {
           "id": "202",
-          "time": "12:00",
-          "category": "美食",
-          "title": "Fairlie Bakehouse 吃超人氣肉餅",
-          "notes": "紐西蘭第一肉餅店！推薦鮭魚鮮蝦餅或豬腳起司餅",
-          "mapQuery": "Fairlie Bakehouse",
-          "phrases": [
+          "time": "15:00",
+          "category": "交通",
+          "title": "前往CBD (Queenstreet)",
+          "notes": "AKL → Hobson Street\n交通工具：SkyDrive Express",
+          "mapQuery": "Hobson street SkyDrive",
+          "phrases": [],
+          "attachments": [
             {
-              "label": "點肉餅",
-              "text": "Could I have one Pork & Apple pie and one Salmon pie, please?"
+              "type": "link",
+              "name": "奧克蘭機場交通",
+              "url": "https://shinshing.tw/auckland-airport-transport/"
+            },
+            {
+              "type": "link",
+              "name": "SkyDrive 購票網頁",
+              "url": "https://www.skydrive.co.nz/"
             }
           ],
-          "attachments": [],
-          "estCost": 25
+          "estCost": ""
         },
         {
           "id": "203",
-          "time": "14:30",
-          "category": "景點",
-          "title": "好牧羊人教堂 (Church of the Good Shepherd)",
-          "notes": "湖畔經典石造教堂，拍蒂卡波牛奶藍湖景",
-          "mapQuery": "Church of the Good Shepherd Tekapo",
-          "phrases": [
+          "time": "15:30",
+          "category": "交通",
+          "title": "Queenstreet shopping & 銀行辦事",
+          "notes": "去ASB銀行辦事\nHobson Street → ASB Queen Street (走路9分鐘)\n\n景點推薦：\nSky Tower\n聖馬修教堂\nAuckland Art Gallery\nWeta Workshop Unleashed (幫電影《魔戒》做特效裝置的工作室)\n\n吃的喝的推薦：\nThe White Lady 好吃的漢堡\nThai E-Sarn 泰式料理\nHullucat 手搖店\nCoCo 手搖店\n\n紀念品店：\nKiwi Gift",
+          "mapQuery": "ASB Queen Street",
+          "phrases": [],
+          "attachments": [
             {
-              "label": "合照請託",
-              "text": "Could you take a photo of us with the lake in the background, please?"
+              "type": "link",
+              "name": "Hullucat",
+              "url": "https://maps.app.goo.gl/MoQqTiG5Hdwuvjt69"
+            },
+            {
+              "type": "link",
+              "name": "聖馬修教堂",
+              "url": "https://maps.app.goo.gl/fiQ18HKCV4wWt3Qw9"
+            },
+            {
+              "type": "link",
+              "name": "Sky Tower",
+              "url": "https://maps.app.goo.gl/boeuiJR5HRvEaNAq8"
+            },
+            {
+              "type": "link",
+              "name": "CoCo 手搖店",
+              "url": "https://maps.app.goo.gl/HQwjbJL6jYEZUntM9"
+            },
+            {
+              "type": "link",
+              "name": "Kiwi Gift",
+              "url": "https://maps.app.goo.gl/o2ENZzxAZJdKFaN7A"
+            },
+            {
+              "type": "link",
+              "name": "Auckland Art Gallery",
+              "url": "https://maps.app.goo.gl/C63iuXNCiYjR4EAi6"
+            },
+            {
+              "type": "link",
+              "name": "The White Lady",
+              "url": "https://maps.app.goo.gl/fgpe9GhZ4fKbDdt26"
+            },
+            {
+              "type": "link",
+              "name": "Weta Workshop Unleashed",
+              "url": "https://maps.app.goo.gl/LjJumgLyjFKvVP9t6"
+            },
+            {
+              "type": "link",
+              "name": "Thai E-Sarn",
+              "url": "https://maps.app.goo.gl/spsrUdT9SYGJXoLy8"
             }
           ],
-          "attachments": [],
           "estCost": 0
         },
         {
@@ -181,6 +249,45 @@
             }
           ],
           "estCost": 180
+        }
+      ]
+    },
+    {
+      "dayNum": 3,
+      "title": "Waiheke Island酒莊",
+      "lodging": "Arluxia Hotel",
+      "items": [
+        {
+          "id": "1792931029371",
+          "time": "09:00",
+          "category": "交通",
+          "title": "出發去酒莊！",
+          "notes": "Downtown Ferry Terminal Pier 1→Waiheke Island\n\n港口附近景點：\nWaitematā Train Station 漂亮的火車站\n\n吃的喝的推薦：\nThe Shucker Brothers 海鮮餐廳\n\n紀念品店：\nAotea Gifts Auckland - Commercial Bay\nOK GIFT SHOP",
+          "mapQuery": "Downtown Ferry Terminal Pier 1",
+          "phrases": [],
+          "attachments": [
+            {
+              "type": "link",
+              "name": "Waitematā Train Station",
+              "url": "https://maps.app.goo.gl/TZ8Faz9Fq9C7mK5NA"
+            },
+            {
+              "type": "link",
+              "name": "The Shucker Brothers",
+              "url": "https://maps.app.goo.gl/y1viCyvK2xW1xN8c6"
+            },
+            {
+              "type": "link",
+              "name": "Aotea Gifts Auckland - Commercial Bay",
+              "url": "https://maps.app.goo.gl/JoFtDvfMHL8SEPGQA"
+            },
+            {
+              "type": "link",
+              "name": "OK GIFT SHOP",
+              "url": "https://maps.app.goo.gl/HBYnnohuj2o2pHEj6"
+            }
+          ],
+          "estCost": 0
         }
       ]
     }
