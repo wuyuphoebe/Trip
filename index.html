@@ -126,11 +126,11 @@
                 </div>
                 <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <span class="text-slate-400 block text-[10px] mb-0.5">住宿地點</span>
-                    <span id="stat-lodging" class="font-black text-emerald-600 text-sm truncate block">未定</span>
+                    <span id="stat-lodging" class="font-black text-emerald-600 text-sm block whitespace-normal break-words leading-snug">未定</span>
                 </div>
                 <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <span class="text-slate-400 block text-[10px] mb-0.5">預估車程/距離</span>
-                    <span id="stat-drive-time" class="font-black text-indigo-600 text-sm truncate block">約 -- km</span>
+                    <span id="stat-drive-time" class="font-black text-indigo-600 text-sm block whitespace-normal break-words leading-snug">約 -- km</span>
                 </div>
             </div>
 
@@ -182,7 +182,11 @@
         <!-- Pre-trip Notes Page -->
         <section id="pretrip-container" class="hidden max-w-4xl mx-auto mt-4 space-y-4 pb-8">
             <div id="pretrip-edit-notice" class="hidden rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                <i class="fa-solid fa-pen-to-square mr-1"></i><b>行前注意事項編輯模式：</b>可直接點選下方文字修改，修改內容會自動儲存在這台裝置的瀏覽器。編輯時請避免點擊官方網站連結。
+                <i class="fa-solid fa-pen-to-square mr-1"></i><b>行前注意事項 CMS 編輯模式：</b>依照分類區塊編輯內容；每個區塊內的新增／刪除按鈕只影響該區塊。修改會自動儲存在目前瀏覽器。
+            </div>
+            <div id="pretrip-cms-panel" class="hidden rounded-2xl border border-amber-200 bg-amber-50/70 p-4 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2"><div><h3 class="font-bold text-slate-800">行前事項編輯區</h3><p class="text-xs text-slate-500 mt-1">每個欄位會即時儲存；新增的項目也會保留。</p></div><button type="button" onclick="addPretripDescription()" class="px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold">＋ 新增一般敘述</button></div>
+                <div id="pretrip-cms-fields" class="space-y-3"></div>
             </div>
             <section class="rounded-2xl bg-gradient-to-br from-emerald-700 to-teal-600 p-5 text-white shadow-md">
                 <div class="flex items-center gap-3 mb-2"><span class="text-3xl">🧳</span><div><p class="text-xs font-semibold tracking-wider text-emerald-100 pretrip-editable" data-pretrip-edit-id="eyebrow">NEW ZEALAND TRIP GUIDE</p><h2 class="text-xl font-black pretrip-editable" data-pretrip-edit-id="hero-title">行前注意事項</h2></div></div>
@@ -254,6 +258,7 @@
             </section>
 
             
+            <div id="pretrip-custom-display" class="space-y-3"></div>
             <div class="flex flex-wrap items-center justify-between gap-3"><p class="text-xs text-slate-400 px-1 pretrip-editable" data-pretrip-edit-id="footer-note">行前清單只會儲存在目前裝置的瀏覽器，不會同步到其他裝置。官方規定可能更新，請以出發時的官方資訊為準。</p><button onclick="resetPretripChecks()" class="shrink-0 px-3 py-2 text-xs font-bold rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-600"><i class="fa-solid fa-rotate-left mr-1"></i>清除所有勾選</button></div>
         </section>
     </main>
@@ -630,25 +635,257 @@
         }
 
         const PRETRIP_TEXT_KEY = 'NZ_TRAVEL_PRETRIP_TEXT_V1';
+        const PRETRIP_CUSTOM_ITEMS_KEY = 'NZ_TRAVEL_PRETRIP_CUSTOM_ITEMS_V1';
+        function getPretripSavedText() {
+            try { return JSON.parse(localStorage.getItem(PRETRIP_TEXT_KEY) || '{}') || {}; } catch (_) { return {}; }
+        }
+        function savePretripText(key, value) {
+            const saved = getPretripSavedText();
+            saved[key] = value;
+            try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
+        }
         function renderPretripTextEdits() {
             const notice = document.getElementById('pretrip-edit-notice');
-            if (notice) notice.classList.toggle('hidden', !(isEditMode && isPretripPage));
-            let savedText = {};
-            try { savedText = JSON.parse(localStorage.getItem(PRETRIP_TEXT_KEY) || '{}') || {}; } catch (_) {}
+            const panel = document.getElementById('pretrip-cms-panel');
+            const fields = document.getElementById('pretrip-cms-fields');
+            const editing = Boolean(isEditMode && isPretripPage);
+            if (notice) notice.classList.toggle('hidden', !editing);
+            if (panel) panel.classList.toggle('hidden', !editing);
+            if (!fields) return;
+
+            const savedText = getPretripSavedText();
+            // 還原各清單新增的項目，並建立穩定的清單 ID。
+            document.querySelectorAll('#pretrip-container ul').forEach((ul, index) => {
+                if (!ul.dataset.pretripListId) {
+                    const first = ul.querySelector('[data-pretrip-edit-id]');
+                    ul.dataset.pretripListId = first ? first.dataset.pretripEditId.replace(/-[^-]+$/, '') : `list-${index}`;
+                }
+                try {
+                    const savedList = localStorage.getItem('NZ_TRAVEL_PRETRIP_LIST_' + ul.dataset.pretripListId);
+                    if (savedList) ul.innerHTML = savedList;
+                } catch (_) {}
+            });
             document.querySelectorAll('#pretrip-container [data-pretrip-edit-id]').forEach(el => {
                 const key = el.dataset.pretripEditId;
-                if (Object.prototype.hasOwnProperty.call(savedText, key)) el.innerHTML = savedText[key];
-                el.contentEditable = (isEditMode && isPretripPage) ? 'true' : 'false';
-                el.classList.toggle('outline-dashed', isEditMode && isPretripPage);
-                el.classList.toggle('outline-amber-300', isEditMode && isPretripPage);
-                el.oninput = (isEditMode && isPretripPage) ? () => {
-                    try {
-                        let latest = JSON.parse(localStorage.getItem(PRETRIP_TEXT_KEY) || '{}') || {};
-                        latest[key] = el.innerHTML;
-                        localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(latest));
-                    } catch (_) {}
-                } : null;
+                if (Object.prototype.hasOwnProperty.call(savedText, key)) el.textContent = savedText[key];
+                el.contentEditable = 'false';
+                el.classList.remove('outline-dashed', 'outline-amber-300');
             });
+            renderPretripCustomDisplay();
+            if (!editing) { fields.innerHTML = ''; return; }
+
+            fields.innerHTML = '';
+            const intro = document.createElement('p');
+            intro.className = 'text-xs text-slate-600';
+            intro.textContent = '已依照頁面分類分區編輯。每個區塊的新增／刪除按鈕只會作用於該區塊；文字修改會即時儲存。';
+            fields.appendChild(intro);
+
+            const root = document.getElementById('pretrip-container');
+            const topSections = Array.from(root.children).filter(el => el.tagName === 'SECTION' && !el.id);
+            const groups = topSections.map((section, idx) => {
+                const titleEl = section.querySelector('h3 [data-pretrip-edit-id], h2[data-pretrip-edit-id], h3[data-pretrip-edit-id]');
+                const title = titleEl ? titleEl.textContent.trim() : (section.querySelector('h2')?.textContent.trim() || `區塊 ${idx + 1}`);
+                const elements = Array.from(section.querySelectorAll('[data-pretrip-edit-id]'));
+                return { section, title, elements };
+            }).filter(group => group.elements.length);
+
+            groups.forEach((group, groupIndex) => {
+                const card = document.createElement('section');
+                card.className = 'rounded-2xl border-2 border-slate-200 bg-white p-3 sm:p-4 space-y-3';
+                const header = document.createElement('div');
+                header.className = 'flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3';
+                const heading = document.createElement('h4');
+                heading.className = 'font-black text-sm text-slate-800';
+                heading.textContent = `${groupIndex + 1}. ${group.title}`;
+                const addBlock = document.createElement('button');
+                addBlock.type = 'button';
+                addBlock.className = 'px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold';
+                addBlock.textContent = '＋ 在此區塊新增項目';
+                addBlock.onclick = () => addPretripBlockItem(group.section);
+                header.append(heading, addBlock);
+                card.appendChild(header);
+
+                group.elements.forEach((el, index) => {
+                    const key = el.dataset.pretripEditId;
+                    const row = document.createElement('div');
+                    row.className = 'rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2';
+                    const label = document.createElement('label');
+                    label.className = 'block text-xs font-bold text-slate-600';
+                    label.textContent = `${index + 1}. ` + (el.tagName === 'H2' || el.tagName === 'H3' || /-title$/.test(key) ? '標題／項目名稱' : '內容文字');
+                    const input = document.createElement('textarea');
+                    input.className = 'w-full text-sm p-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none bg-white';
+                    input.rows = el.textContent.length > 90 ? 3 : 2;
+                    input.value = el.textContent;
+                    input.oninput = () => {
+                        el.textContent = input.value;
+                        savePretripText(key, input.value);
+                        // 清單項目以 HTML 保存時也同步更新，避免重新整理後還原舊文字。
+                        if (el.parentElement?.tagName === 'LI' && el.closest('ul')) persistPretripList(el.closest('ul'));
+                    };
+                    row.append(label, input);
+
+                    // 將刪除控制放在「實際項目」上，而不只檢查編輯元素本身是不是 LI。
+                    // 例如自駕清單的 LI 裡面是標題與說明兩個編輯欄位；文件區則是 checkbox label。
+                    const itemLi = el.tagName === 'LI' ? el : el.closest('li');
+                    const itemLabel = el.closest('label');
+                    const logicalItem = itemLi || (itemLabel && itemLabel.querySelector('.pretrip-check') ? itemLabel : null);
+                    const firstEditorInItem = logicalItem && (logicalItem.matches('[data-pretrip-edit-id]') ? logicalItem : logicalItem.querySelector('[data-pretrip-edit-id]'));
+                    const isFirstEditorInItem = logicalItem && firstEditorInItem === el;
+                    if (logicalItem && isFirstEditorInItem) {
+                        const actions = document.createElement('div');
+                        actions.className = 'flex flex-wrap justify-end gap-2';
+                        if (itemLi && itemLi.parentElement?.tagName === 'UL') {
+                            const list = itemLi.parentElement;
+                            const add = document.createElement('button');
+                            add.type = 'button'; add.className = 'px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-700 text-xs font-bold';
+                            add.textContent = '＋ 在此清單新增';
+                            add.onclick = () => addPretripListItem(list, itemLi);
+                            actions.appendChild(add);
+                        }
+                        const del = document.createElement('button');
+                        del.type = 'button'; del.className = 'px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 text-xs font-bold';
+                        del.textContent = '刪除此項';
+                        del.onclick = () => deletePretripLogicalItem(logicalItem);
+                        actions.appendChild(del);
+                        row.appendChild(actions);
+                    } else if (!logicalItem && (el.matches('h2, h3, p') || /-title$/.test(key))) {
+                        // 區塊標題、提醒文字等非清單項目也提供刪除控制，避免這些欄位完全無法刪除。
+                        const actions = document.createElement('div');
+                        actions.className = 'flex justify-end';
+                        const del = document.createElement('button');
+                        del.type = 'button'; del.className = 'px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 text-xs font-bold';
+                        del.textContent = '刪除此項';
+                        del.onclick = () => deletePretripLogicalItem(el);
+                        actions.appendChild(del);
+                        row.appendChild(actions);
+                    }
+                    card.appendChild(row);
+                });
+                fields.appendChild(card);
+            });
+            renderPretripCustomDescriptions();
+        }
+        function addPretripBlockItem(section) {
+            let list = section.querySelector('ul');
+            if (!list) {
+                // 文件區原本是勾選清單，將新增項目放在該區塊內，不影響其他分類。
+                list = document.createElement('ul');
+                list.className = 'space-y-2 text-sm leading-6 text-slate-600 list-disc pl-5 mt-2';
+                list.dataset.pretripListId = 'documents-added';
+                const content = section.querySelector('.space-y-3.text-sm') || section;
+                content.appendChild(list);
+            }
+            if (!list.dataset.pretripListId) list.dataset.pretripListId = 'block-' + Array.from(document.querySelectorAll('#pretrip-container > section')).indexOf(section);
+            const li = document.createElement('li');
+            li.className = 'pretrip-editable';
+            li.dataset.pretripEditId = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+            li.textContent = '請輸入新項目';
+            list.appendChild(li);
+            const saved = getPretripSavedText(); saved[li.dataset.pretripEditId] = li.textContent;
+            try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
+            persistPretripList(list);
+            renderPretripTextEdits();
+            const inputs = Array.from(document.querySelectorAll('#pretrip-cms-fields textarea'));
+            const target = inputs.find(input => input.value === '請輸入新項目');
+            if (target) { target.focus(); target.select(); }
+        }
+        function persistPretripList(list) {
+            const key = 'NZ_TRAVEL_PRETRIP_LIST_' + (list.dataset.pretripListId || 'custom-list');
+            try { localStorage.setItem(key, list.innerHTML); } catch (_) {}
+        }
+        function addPretripListItem(list, afterItem) {
+            const id = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+            const li = document.createElement('li');
+            li.className = afterItem.className || 'pretrip-editable';
+            li.dataset.pretripEditId = id;
+            li.textContent = '請輸入新項目';
+            afterItem.insertAdjacentElement('afterend', li);
+            const saved = getPretripSavedText(); saved[id] = li.textContent;
+            try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
+            persistPretripList(list);
+            renderPretripTextEdits();
+            const inputs = document.querySelectorAll('#pretrip-cms-fields textarea');
+            const target = Array.from(inputs).find(input => input.value === '請輸入新項目');
+            if (target) { target.focus(); target.select(); }
+        }
+        function deletePretripListItem(list, li) {
+            if (!confirm('確定要刪除此清單項目嗎？')) return;
+            const id = li.dataset.pretripEditId;
+            li.remove();
+            const saved = getPretripSavedText(); delete saved[id];
+            try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
+            persistPretripList(list);
+            renderPretripTextEdits();
+        }
+        function deletePretripLogicalItem(item) {
+            if (!item || !confirm('確定要刪除此項目嗎？此操作只會影響目前所在的區塊。')) return;
+            const list = item.tagName === 'LI' ? item.parentElement : null;
+            const ids = Array.from(item.querySelectorAll('[data-pretrip-edit-id]')).map(el => el.dataset.pretripEditId);
+            if (item.dataset?.pretripEditId) ids.push(item.dataset.pretripEditId);
+            item.remove();
+            const saved = getPretripSavedText();
+            ids.forEach(id => delete saved[id]);
+            try { localStorage.setItem(PRETRIP_TEXT_KEY, JSON.stringify(saved)); } catch (_) {}
+            if (list && list.tagName === 'UL') persistPretripList(list);
+            renderPretripChecks();
+        }
+        function movePretripTextItem(key, direction) {
+            const elements = Array.from(document.querySelectorAll('#pretrip-container [data-pretrip-edit-id]'));
+            const index = elements.findIndex(el => el.dataset.pretripEditId === key);
+            const el = elements[index];
+            const target = elements[index + direction];
+            if (!el || !target || el.parentElement !== target.parentElement) {
+                showToast('只能在同一個區塊內調整項目順序', true);
+                return;
+            }
+            if (direction < 0) target.insertAdjacentElement('beforebegin', el);
+            else target.insertAdjacentElement('afterend', el);
+            if (el.parentElement.tagName === 'UL') persistPretripList(el.parentElement);
+            renderPretripTextEdits();
+        }
+        function addPretripDescription() {
+            let custom = [];
+            try { custom = JSON.parse(localStorage.getItem(PRETRIP_CUSTOM_ITEMS_KEY) || '[]') || []; } catch (_) {}
+            custom.push({ id: 'custom-desc-' + Date.now(), text: '請輸入一般敘述' });
+            try { localStorage.setItem(PRETRIP_CUSTOM_ITEMS_KEY, JSON.stringify(custom)); } catch (_) {}
+            renderPretripTextEdits();
+            const inputs = document.querySelectorAll('#pretrip-custom-descriptions textarea');
+            if (inputs.length) { inputs[inputs.length - 1].focus(); inputs[inputs.length - 1].select(); }
+        }
+        function renderPretripCustomDisplay() {
+            const display = document.getElementById('pretrip-custom-display');
+            if (!display) return;
+            let custom = [];
+            try { custom = JSON.parse(localStorage.getItem(PRETRIP_CUSTOM_ITEMS_KEY) || '[]') || []; } catch (_) {}
+            display.innerHTML = '';
+            custom.forEach(item => {
+                const card = document.createElement('section');
+                card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80';
+                const p = document.createElement('p'); p.className = 'text-sm leading-6 text-slate-700 whitespace-pre-wrap'; p.textContent = item.text;
+                card.appendChild(p); display.appendChild(card);
+            });
+        }
+        function renderPretripCustomDescriptions() {
+            const fields = document.getElementById('pretrip-cms-fields');
+            if (!fields || !(isEditMode && isPretripPage)) return;
+            let custom = [];
+            try { custom = JSON.parse(localStorage.getItem(PRETRIP_CUSTOM_ITEMS_KEY) || '[]') || []; } catch (_) {}
+            if (!custom.length) return;
+            const section = document.createElement('div');
+            section.className = 'rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-3 space-y-3';
+            const heading = document.createElement('h4'); heading.className = 'font-bold text-sm text-emerald-800'; heading.textContent = '新增的一般敘述'; section.appendChild(heading);
+            custom.forEach((item, index) => {
+                const row = document.createElement('div'); row.className = 'rounded-xl bg-white border border-emerald-100 p-3 flex gap-2 items-start';
+                const main = document.createElement('div'); main.className = 'flex-1 min-w-0 space-y-1';
+                const label = document.createElement('label'); label.className = 'block text-xs font-bold text-slate-600'; label.textContent = `#${index + 1} 一般敘述`;
+                const area = document.createElement('textarea'); area.className = 'w-full text-sm p-2 rounded-xl border border-slate-300'; area.rows = 3; area.value = item.text;
+                area.oninput = () => { item.text = area.value; try { localStorage.setItem(PRETRIP_CUSTOM_ITEMS_KEY, JSON.stringify(custom)); } catch (_) {} renderPretripCustomDisplay(); };
+                main.append(label, area);
+                const del = document.createElement('button'); del.type = 'button'; del.className = 'px-3 py-2 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold'; del.textContent = '刪除';
+                del.onclick = () => { if (!confirm('確定要刪除此敘述嗎？')) return; custom.splice(index, 1); try { localStorage.setItem(PRETRIP_CUSTOM_ITEMS_KEY, JSON.stringify(custom)); } catch (_) {} renderPretripTextEdits(); };
+                row.append(main, del); section.appendChild(row);
+            });
+            fields.appendChild(section);
         }
         function updatePretripProgress() {
             const checks = Array.from(document.querySelectorAll('#pretrip-container .pretrip-check'));
