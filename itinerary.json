@@ -192,7 +192,7 @@
           "time": "15:30",
           "category": "交通",
           "title": "Queenstreet shopping & 銀行辦事",
-          "notes": "去ASB銀行辦事\nHobson Street → ASB Queen Street (走路9分鐘)\n\n景點推薦：\nSky Tower\n聖馬修教堂\nAuckland Art Gallery\nWeta Workshop Unleashed (幫電影《魔戒》做特效裝置的工作室)\n\n吃的喝的推薦：\nThe White Lady 好吃的漢堡\nThai E-Sarn 泰式料理\nHulucat 手搖店\nCoCo 手搖店\n\n紀念品店：\nKiwi Gift\nAesop 奧克蘭市\n\n行李寄放處：\nRadical Storage APP",
+          "notes": "去ASB銀行辦事\nHobson Street → ASB Queen Street (走路9分鐘)\n去超市逛逛買個早餐\n\n景點推薦：\nSky Tower\n聖馬修教堂\nAuckland Art Gallery\nWeta Workshop Unleashed (幫電影《魔戒》做特效裝置的工作室)\n\n吃的喝的推薦：\nBurgerFuel Queen Street 紐西蘭人愛吃的漢堡店，有特別的飲料：lemon and paeroa(好喝，檸檬汽水)\nThe White Lady 好吃的漢堡\nThai E-Sarn 泰式料理\nHulucat 手搖店\nCoCo 手搖店\n\n紀念品店：\nKiwi Gift\nAesop 奧克蘭市\n\n行李寄放處：\nRadical Storage APP",
           "mapQuery": "ASB Queen Street",
           "phrases": [],
           "attachments": [],
@@ -227,7 +227,7 @@
           "time": "09:00",
           "category": "交通",
           "title": "出發去Waiheke Island！",
-          "notes": "Downtown Ferry Terminal Pier 1→Waiheke Island\n\n港口附近景點：\nWaitematā Train Station 漂亮的火車站\n紐西蘭海事博物館\n\n吃的喝的推薦：\nThe Shucker Brothers 海鮮餐廳\nAmano 早午餐\n\n紀念品店：\nAotea Gifts Auckland - Commercial Bay\nOK GIFT SHOP",
+          "notes": "Downtown Ferry Terminal Pier 1→Waiheke Island\n交通工具：渡輪\n\n港口附近景點：\nWaitematā Train Station 漂亮的火車站\n紐西蘭海事博物館\n\n吃的喝的推薦：\nThe Shucker Brothers 海鮮餐廳\nAmano 早午餐\n\n紀念品店：\nAotea Gifts Auckland - Commercial Bay\nOK GIFT SHOP",
           "mapQuery": "Downtown Ferry Terminal Pier 1",
           "phrases": [],
           "attachments": [
@@ -268,6 +268,268 @@
               "url": "https://www.fullers.co.nz/destinations-and-experiences/experiences/day-tours/waiheke-western-explorer-hop-on-hop-off-bus/"
             }
           ],
+          "estCost": 0
+        },
+        {
+          "id": "1793050781993",
+          "time": "anytime",
+          "category": "美食",
+          "title": "晚餐time",
+          "notes": "在港口附近逛逛，找個東西吃",
+          "mapQuery": "Downtown Terminal",
+          "phrases": [],
+          "attachments": [],
+          "estCost": 0
+        },
+        {
+          "id": "1793051208449",
+          "time": "anytime",
+          "category": "住宿",
+          "title": "回民宿",
+          "notes": "好好休息～",
+          "mapQuery": "Arluxia Hotel",
+          "phrases": [
+            {
+              "label": "詢問處",
+              "text": "Excuse me, where is the main entrance?"
+            }
+          ],
+          "attachments": [],
+          "estCost": 0
+        }
+      ]
+    },
+    {
+      "dayNum": 4,
+      "title": "魔戒 tour - 哈比村",
+      "lodging": "Arluxia Hotel",
+      "items": [
+        {
+          "id": "1793051304317",
+          "time": "5:00",
+          "category": "交通",
+          "title": "出發前往集合點－SkyCity Auckland",
+          "notes": "Uber: 10 分鐘；紐幣 9.96元\n走路：半小時",
+          "mapQuery": "SkyCity Auckland",
+          "phrases": [],
+          "attachments": [],
+          "estCost": 0
+        },
+        {
+          "id": "1793052268077",
+          "time": "5:30",
+          "category": "交通",
+          "title": "Hobbiton之旅",
+          "notes": "5:30 集合出發\n15:30 回到Sky tower",
+          "mapQuery": "Hobbiton™ Movie Set Tours",
+          "phrases": [],
+          "attachments": [],
+          "estCost": 0
+        },
+        {
+          "id": "1793053141887",
+          "time": "anytime",
+          "category": "美食",
+          "title": "市區隨意逛逛 & 晚餐",
+          "notes": "",
+          "mapQuery": "Sky Tower Auckland",
+          "phrases": [],
+          "attachments": [],
+          "estCost": 0
+        },
+        {
+          "id": "1793053232749",
+          "time": "anytime",
+          "category": "住宿",
+          "title": "回到住宿",
+          "notes": "早點休息，明天早起搭飛機前往基督城",
+          "mapQuery": "Arluxia Hotel",
+          "phrases": [],
+          "attachments": [],
+          "estCost": 0
+        }
+      ]
+    },
+    {
+      "dayNum": 5,
+      "title": "基督城抵達與市區探索",
+      "lodging": "Drifter Christchurch",
+      "items": [
+        {
+          "id": "1793051674069",
+          "time": "4:15",
+          "category": "交通",
+          "title": "出發到機場(Auckland Domestic Airport )",
+          "notes": "退房：感應卡放回感應盒就好\n已預約Uber去機場",
+          "mapQuery": "Arluxia Hotel",
+          "phrases": [],
+          "attachments": [],
+          "estCost": 0
+        },
+        {
+          "id": "1793053790462",
+          "time": "4:45",
+          "category": "交通",
+          "title": "到達機場",
+          "notes": "航班：JQ227\n7:00 AKL -8:25 CHC",
+          "mapQuery": "Auckland Domestic Airport",
+          "phrases": [],
+          "attachments": [],
+          "estCost": 0
+        },
+        {
+          "id": "1793053873122",
+          "time": "7:00",
+          "category": "交通",
+          "title": "前往基督城",
+          "notes": "",
+          "mapQuery": "Auckland Domestic Airport",
+          "phrases": [],
+          "attachments": [],
+          "estCost": 0
+        },
+        {
+          "id": "1793054166172",
+          "time": "8:25",
+          "category": "交通",
+          "title": "抵達基督城",
+          "notes": "",
+          "mapQuery": "Christchurch Airport",
+          "phrases": [],
+          "attachments": [],
+          "estCost": 0
+        }
+      ]
+    },
+    {
+      "dayNum": 6,
+      "title": "皇后鎮抵達與市區探索",
+      "lodging": "自訂住宿地點",
+      "items": [
+        {
+          "id": "1793054268653",
+          "time": "09:00",
+          "category": "景點",
+          "title": "展開精彩一日探險",
+          "notes": "在此輸入今天的行程概要",
+          "mapQuery": "New Zealand",
+          "phrases": [
+            {
+              "label": "問候",
+              "text": "Good morning!"
+            }
+          ],
+          "attachments": [],
+          "estCost": 0
+        }
+      ]
+    },
+    {
+      "dayNum": 7,
+      "title": "第 7 天行程",
+      "lodging": "自訂住宿地點",
+      "items": [
+        {
+          "id": "1793054299286",
+          "time": "09:00",
+          "category": "景點",
+          "title": "展開精彩一日探險",
+          "notes": "在此輸入今天的行程概要",
+          "mapQuery": "New Zealand",
+          "phrases": [
+            {
+              "label": "問候",
+              "text": "Good morning!"
+            }
+          ],
+          "attachments": [],
+          "estCost": 0
+        }
+      ]
+    },
+    {
+      "dayNum": 8,
+      "title": "黃金海岸",
+      "lodging": "自訂住宿地點",
+      "items": [
+        {
+          "id": "1793054301670",
+          "time": "09:00",
+          "category": "景點",
+          "title": "展開精彩一日探險",
+          "notes": "在此輸入今天的行程概要",
+          "mapQuery": "New Zealand",
+          "phrases": [
+            {
+              "label": "問候",
+              "text": "Good morning!"
+            }
+          ],
+          "attachments": [],
+          "estCost": 0
+        }
+      ]
+    },
+    {
+      "dayNum": 9,
+      "title": "黃金海岸與布里斯本市區探索",
+      "lodging": "Hotel Diana Woolloongabba",
+      "items": [
+        {
+          "id": "1793054317874",
+          "time": "09:00",
+          "category": "景點",
+          "title": "展開精彩一日探險",
+          "notes": "在此輸入今天的行程概要",
+          "mapQuery": "New Zealand",
+          "phrases": [
+            {
+              "label": "問候",
+              "text": "Good morning!"
+            }
+          ],
+          "attachments": [],
+          "estCost": 0
+        }
+      ]
+    },
+    {
+      "dayNum": 10,
+      "title": "布里斯本市區探索",
+      "lodging": "飛機上",
+      "items": [
+        {
+          "id": "1793054324767",
+          "time": "09:00",
+          "category": "景點",
+          "title": "布里斯本市區探索",
+          "notes": "",
+          "mapQuery": "Brisbane",
+          "phrases": [
+            {
+              "label": "問候",
+              "text": "Good morning!"
+            }
+          ],
+          "attachments": [],
+          "estCost": 0
+        }
+      ]
+    },
+    {
+      "dayNum": 11,
+      "title": "抵達台灣",
+      "lodging": "家裡",
+      "items": [
+        {
+          "id": "1793054326220",
+          "time": "5:45",
+          "category": "交通",
+          "title": "抵達台灣",
+          "notes": "回來繼續當社畜 難過...",
+          "mapQuery": "Taiwan Taoyuan International Airport (TPE)",
+          "phrases": [],
+          "attachments": [],
           "estCost": 0
         }
       ]
