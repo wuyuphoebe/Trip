@@ -16,12 +16,12 @@
           "attachments": [
             {
               "type": "link",
-              "name": "台北飛奧克蘭_Yu",
+              "name": "台北飛奧克蘭機票_Yu",
               "url": "https://drive.google.com/file/d/1XxgcZfZOjHhNFWoTSYjsCDLY3cUm40SU/view?usp=drive_link"
             },
             {
               "type": "link",
-              "name": "台北飛奧克蘭_阿姨",
+              "name": "台北飛奧克蘭機票_阿姨",
               "url": "https://drive.google.com/file/d/1fNG69lQ0X9NxW88pbSYqCu_asXmh-qaM/view?usp=drive_link"
             }
           ],
@@ -154,8 +154,8 @@
             },
             {
               "type": "link",
-              "name": "行李清單",
-              "url": "https://docs.google.com/spreadsheets/d/1o4Hz8XPOba-Zlwx4hQp6PlPTODM6CBBK/edit?usp=drive_link&ouid=112902641538693495730&rtpof=true&sd=true"
+              "name": "行李清單_Yu",
+              "url": "https://docs.google.com/spreadsheets/d/1cpKD0TSb4cQZd7Rbe02UnD7j1UbJBRI8/edit?usp=drive_link&ouid=112902641538693495730&rtpof=true&sd=true"
             },
             {
               "type": "link",
@@ -192,119 +192,80 @@
           "time": "15:30",
           "category": "交通",
           "title": "Queenstreet shopping & 銀行辦事",
-          "notes": "去ASB銀行辦事\nHobson Street → ASB Queen Street (走路9分鐘)\n\n景點推薦：\nSky Tower\n聖馬修教堂\nAuckland Art Gallery\nWeta Workshop Unleashed (幫電影《魔戒》做特效裝置的工作室)\n\n吃的喝的推薦：\nThe White Lady 好吃的漢堡\nThai E-Sarn 泰式料理\nHulucat 手搖店\nCoCo 手搖店\n\n紀念品店：\nKiwi Gift",
+          "notes": "去ASB銀行辦事\nHobson Street → ASB Queen Street (走路9分鐘)\n\n景點推薦：\nSky Tower\n聖馬修教堂\nAuckland Art Gallery\nWeta Workshop Unleashed (幫電影《魔戒》做特效裝置的工作室)\n\n吃的喝的推薦：\nThe White Lady 好吃的漢堡\nThai E-Sarn 泰式料理\nHulucat 手搖店\nCoCo 手搖店\n\n紀念品店：\nKiwi Gift\nAesop 奧克蘭市\n\n行李寄放處：\nRadical Storage APP",
           "mapQuery": "ASB Queen Street",
           "phrases": [],
-          "attachments": [
-            {
-              "type": "link",
-              "name": "Hulucat",
-              "url": "https://maps.app.goo.gl/MoQqTiG5Hdwuvjt69"
-            },
-            {
-              "type": "link",
-              "name": "聖馬修教堂",
-              "url": "https://maps.app.goo.gl/fiQ18HKCV4wWt3Qw9"
-            },
-            {
-              "type": "link",
-              "name": "Sky Tower",
-              "url": "https://maps.app.goo.gl/boeuiJR5HRvEaNAq8"
-            },
-            {
-              "type": "link",
-              "name": "CoCo 手搖店",
-              "url": "https://maps.app.goo.gl/HQwjbJL6jYEZUntM9"
-            },
-            {
-              "type": "link",
-              "name": "Kiwi Gift",
-              "url": "https://maps.app.goo.gl/o2ENZzxAZJdKFaN7A"
-            },
-            {
-              "type": "link",
-              "name": "Auckland Art Gallery",
-              "url": "https://maps.app.goo.gl/C63iuXNCiYjR4EAi6"
-            },
-            {
-              "type": "link",
-              "name": "The White Lady",
-              "url": "https://maps.app.goo.gl/fgpe9GhZ4fKbDdt26"
-            },
-            {
-              "type": "link",
-              "name": "Weta Workshop Unleashed",
-              "url": "https://maps.app.goo.gl/LjJumgLyjFKvVP9t6"
-            },
-            {
-              "type": "link",
-              "name": "Thai E-Sarn",
-              "url": "https://maps.app.goo.gl/spsrUdT9SYGJXoLy8"
-            }
-          ],
+          "attachments": [],
           "estCost": 0
         },
         {
           "id": "204",
-          "time": "21:30",
-          "category": "景點",
-          "title": "Tekapo 觀星體驗 (Dark Sky Project)",
-          "notes": "世界級暗空保護區，觀賞銀河與南十字星\n需提早 15 分鐘至遊客中心報到",
-          "mapQuery": "Dark Sky Project Tekapo",
-          "phrases": [
-            {
-              "label": "觀星報到",
-              "text": "Hi, we booked the 9:30 PM stargazing tour under Wu."
-            },
-            {
-              "label": "防寒保暖詢問",
-              "text": "Is it cold up on the mountain? Should we wear heavy jackets?"
-            }
-          ],
+          "time": "18:00",
+          "category": "住宿",
+          "title": "抵達住宿 Check in",
+          "notes": "在CBD吃完飯再回來 or 在住宿附近的餐廳吃飯\n\nAluxia 坐落於Freeman's Bay Ponsonby，該區以維多利亞時代的典雅風情與多元文化聞名\nPonsonby 是奧克蘭「最 Cool」的生活區，餐廳平均品質高於市區，人均消費也稍高一點。適合想輕鬆用餐、感受奧克蘭中產生活品味的旅客。Cocoro 懷石、Siostra 波蘭料理、各種精品咖啡館都在這一帶。從 CBD 搭公車或打 Uber 約 10–15 分鐘，費用 NZD 5–8。\n\n住宿有附：\n免費車位\n免費迎賓零食\nOliver and Saga 沐浴備品\nAllpress精品咖啡\n免費洗衣機與烘衣機\n\n住宿附近－\n美食：\nPrego Restaurant 義大利餐廳(Phoebe 推薦)\nCotto 義大利小館，手工麵和 Tiramisu 都很扎實\nFishSmith Herne Bay 炸魚薯條店\nBurger Burger Ponsonby 牛肉是 Hawke’s Bay 草飼牛現絞、每天新鮮製作，麵包是自製布里歐修，搭配限定醬料。主餐漢堡 NZD 22–26，配手工薯條和一杯 KraftWork 精釀，就是完美的奧克蘭漢堡體驗。\nCazador 野味料理，獵鹿、野兔、鴕鳥——敢吃的話值得一試\n\n逛街：\nPonsonby Central：市集式美食廣場，多個獨立攤位，週末最熱鬧\nPonsonby Road  大型設計師店和小型獨立選物店並存。這裡有奧克蘭 1989 年就開業的老字號書店 The Women’s Bookshop，也有走復古路線的古著店，逛一趟能挖到不少市區商場買不到的獨特單品\nVictoria Park（Skate Park）\n\n酒吧：\nThe Blue Breeze Inn 南洋風格雞尾酒吧，調酒創意十足",
+          "mapQuery": "Arluxia Hotel",
+          "phrases": [],
           "attachments": [
             {
               "type": "link",
-              "name": "Dark Sky Project 觀星預約官網",
-              "url": "https://www.darkskyproject.co.nz/"
+              "name": "Arluxia Auckland 住宿訂單",
+              "url": "https://drive.google.com/file/d/16xE-FqxNfwhKWUK2YDu8jp3LJ2pYQo42/view?usp=drive_link"
             }
           ],
-          "estCost": 180
+          "estCost": ""
         }
       ]
     },
     {
       "dayNum": 3,
-      "title": "Waiheke Island酒莊",
+      "title": "Waiheke Island 「酒莊島」",
       "lodging": "Arluxia Hotel",
       "items": [
         {
           "id": "1792931029371",
           "time": "09:00",
           "category": "交通",
-          "title": "出發去酒莊！",
-          "notes": "Downtown Ferry Terminal Pier 1→Waiheke Island\n\n港口附近景點：\nWaitematā Train Station 漂亮的火車站\n\n吃的喝的推薦：\nThe Shucker Brothers 海鮮餐廳\n\n紀念品店：\nAotea Gifts Auckland - Commercial Bay\nOK GIFT SHOP",
+          "title": "出發去Waiheke Island！",
+          "notes": "Downtown Ferry Terminal Pier 1→Waiheke Island\n\n港口附近景點：\nWaitematā Train Station 漂亮的火車站\n紐西蘭海事博物館\n\n吃的喝的推薦：\nThe Shucker Brothers 海鮮餐廳\nAmano 早午餐\n\n紀念品店：\nAotea Gifts Auckland - Commercial Bay\nOK GIFT SHOP",
           "mapQuery": "Downtown Ferry Terminal Pier 1",
           "phrases": [],
           "attachments": [
             {
               "type": "link",
-              "name": "Waitematā Train Station",
-              "url": "https://maps.app.goo.gl/TZ8Faz9Fq9C7mK5NA"
+              "name": "Waiheke island 介紹",
+              "url": "https://winnieexplorer.com/waiheke-island-reviews/"
+            }
+          ],
+          "estCost": 0
+        },
+        {
+          "id": "1793047605339",
+          "time": "9:40",
+          "category": "景點",
+          "title": "抵達Waiheke Island",
+          "notes": "隨上隨下巴士\n第一站：Mudbrick Winery 是懷赫科島最有名、也最熱門的酒莊(如果想體驗 Wine Tasting，記得直接上去天台酒吧！樓下餐廳只提供正餐，不能試酒。)\nStonyridge Vineyard 15鈕可以品三種酒\nBatch Winery\nWild Estate 窯烤披薩餅皮香脆、餡料超豐富，而招牌「酥炸魷魚 (Flash-Fried Squid)」外酥內嫩、調味剛剛好\nThe Heke Kitchen 另一個人氣美食據點！這裡的披薩和鮮嫩多汁的鮭魚排都大受好評\nCable Bay Vineyard 這裡的品酒體驗超棒！特別推薦一款風味層次超豐富的夏多內 (Chardonnay) 🍷\nGoldie Estate 島上最古老的酒莊之一，氣氛靜謐又古樸。標誌性的「孤獨樹」和輪胎鞦韆是絕佳打卡點\n🇪🇸 Casita Miro 滿滿西班牙風情的酒莊，獨特建築讓人彷彿置身歐洲。別錯過精緻的塔帕斯 (Tapas) 小吃🍴，超適合配酒享用\nRangihoua Estate 可以親眼看到特級初榨橄欖油的製作過程，還能現場試吃、購買，價格也很親民\n\n\n美食推薦：\nIsland Gelato Co. Waiheke 冰淇淋\nI Love Crepes 法式可麗餅\nCharlie Farley's 炸魚薯條\n\n景點推薦：\nWaiheke Art Gallery",
+          "mapQuery": "",
+          "phrases": [
+            {
+              "label": "嗨！請問這裡有提供品酒嗎？",
+              "text": "Hi! Do you offer wine tasting here"
+            },
+            {
+              "label": "請問品酒一個人多少錢呢？",
+              "text": "How much is the tasting per person?"
+            }
+          ],
+          "attachments": [
+            {
+              "type": "link",
+              "name": "Waiheke 渡輪+隨上隨下巴士訂票網站",
+              "url": "https://www.fullers.co.nz/booking/?sc=TRWIHOPOF360"
             },
             {
               "type": "link",
-              "name": "The Shucker Brothers",
-              "url": "https://maps.app.goo.gl/y1viCyvK2xW1xN8c6"
-            },
-            {
-              "type": "link",
-              "name": "Aotea Gifts Auckland - Commercial Bay",
-              "url": "https://maps.app.goo.gl/JoFtDvfMHL8SEPGQA"
-            },
-            {
-              "type": "link",
-              "name": "OK GIFT SHOP",
-              "url": "https://maps.app.goo.gl/HBYnnohuj2o2pHEj6"
+              "name": "隨上隨下巴士資訊(時間表、地圖)",
+              "url": "https://www.fullers.co.nz/destinations-and-experiences/experiences/day-tours/waiheke-western-explorer-hop-on-hop-off-bus/"
             }
           ],
           "estCost": 0
