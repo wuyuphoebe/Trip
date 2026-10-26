@@ -1330,158 +1330,17 @@
         }
 
         // TTS & Copy Helpers
-        // 將長句拆成較短片段依序朗讀，避免部分瀏覽器遇到長文字時無聲或中途停止。
-        let speechRunId = 0;
-        function splitSpeechText(text, maxLength = 180) {
-            const normalized = String(text || '').replace(/\s+/g, ' ').trim();
-            if (!normalized) return [];
-            const sentences = normalized.match(/[^.!?;:]+[.!?;:]*|[^.!?;:]+$/g) || [normalized];
-            const chunks = [];
-            let current = '';
-            const pushLongPart = (part) => {
-                let rest = part.trim();
-                while (rest.length > maxLength) {
-                    let cut = rest.lastIndexOf(' ', maxLength);
-                    if (cut < Math.floor(maxLength * 0.55)) cut = maxLength;
-                    chunks.push(rest.slice(0, cut).trim());
-                    rest = rest.slice(cut).trim();
-                }
-                if (rest) {
-                    if (current && (current + ' ' + rest).length <= maxLength) current += ' ' + rest;
-                    else {
-                        if (current) chunks.push(current);
-                        current = rest;
-                    }
-                }
-            };
-            for (const sentence of sentences) {
-                const part = sentence.trim();
-                if (!part) continue;
-                if ((current ? current.length + 1 : 0) + part.length <= maxLength) {
-                    current = current ? current + ' ' + part : part;
-                } else {
-                    if (current) { chunks.push(current); current = ''; }
-                    pushLongPart(part);
-                }
-            }
-            if (current) chunks.push(current);
-            return chunks;
-        }
-
-        // 將常見英文縮寫在「朗讀前」展開，避免部分瀏覽器語音引擎讀不出撇號縮寫。
-        // 網頁顯示與複製的原文不會被修改，只處理送入語音引擎的文字。
-        function expandEnglishContractions(text) {
-            const rules = [
-                [/\bwon't\b/gi, 'will not'],
-                [/\bcan't\b/gi, 'cannot'],
-                [/\bcannot\'t\b/gi, 'cannot'],
-                [/\bshan't\b/gi, 'shall not'],
-                [/\bain't\b/gi, 'is not'],
-                [/\bi'm\b/gi, 'I am'],
-                [/\bi'll\b/gi, 'I will'],
-                [/\bi've\b/gi, 'I have'],
-                [/\bi'd\b/gi, 'I would'],
-                [/\byou're\b/gi, 'you are'],
-                [/\byou'll\b/gi, 'you will'],
-                [/\byou've\b/gi, 'you have'],
-                [/\byou'd\b/gi, 'you would'],
-                [/\bwe're\b/gi, 'we are'],
-                [/\bwe'll\b/gi, 'we will'],
-                [/\bwe've\b/gi, 'we have'],
-                [/\bwe'd\b/gi, 'we would'],
-                [/\bthey're\b/gi, 'they are'],
-                [/\bthey'll\b/gi, 'they will'],
-                [/\bthey've\b/gi, 'they have'],
-                [/\bthey'd\b/gi, 'they would'],
-                [/\bhe's\b/gi, 'he is'],
-                [/\bhe'll\b/gi, 'he will'],
-                [/\bhe'd\b/gi, 'he would'],
-                [/\bshe's\b/gi, 'she is'],
-                [/\bshe'll\b/gi, 'she will'],
-                [/\bshe'd\b/gi, 'she would'],
-                [/\bit's\b/gi, 'it is'],
-                [/\bit'll\b/gi, 'it will'],
-                [/\bit'd\b/gi, 'it would'],
-                [/\bthat's\b/gi, 'that is'],
-                [/\bthat'll\b/gi, 'that will'],
-                [/\bthere's\b/gi, 'there is'],
-                [/\bthere'll\b/gi, 'there will'],
-                [/\bthere'd\b/gi, 'there would'],
-                [/\bwhat's\b/gi, 'what is'],
-                [/\bwhat'll\b/gi, 'what will'],
-                [/\bwho's\b/gi, 'who is'],
-                [/\bwho'll\b/gi, 'who will'],
-                [/\bwhere's\b/gi, 'where is'],
-                [/\bwhen's\b/gi, 'when is'],
-                [/\bwhy's\b/gi, 'why is'],
-                [/\bhow's\b/gi, 'how is'],
-                [/\blet's\b/gi, 'let us'],
-                [/\bdon't\b/gi, 'do not'],
-                [/\bdoesn't\b/gi, 'does not'],
-                [/\bdidn't\b/gi, 'did not'],
-                [/\bisn't\b/gi, 'is not'],
-                [/\baren't\b/gi, 'are not'],
-                [/\bwasn't\b/gi, 'was not'],
-                [/\bweren't\b/gi, 'were not'],
-                [/\bhaven't\b/gi, 'have not'],
-                [/\bhasn't\b/gi, 'has not'],
-                [/\bhadn't\b/gi, 'had not'],
-                [/\bwouldn't\b/gi, 'would not'],
-                [/\bcouldn't\b/gi, 'could not'],
-                [/\bshouldn't\b/gi, 'should not'],
-                [/\bmustn't\b/gi, 'must not'],
-                [/\bneedn't\b/gi, 'need not'],
-                [/\bwon't\b/gi, 'will not']
-            ];
-            let result = String(text ?? '');
-            for (const [pattern, expanded] of rules) {
-                result = result.replace(pattern, match => {
-                    // 保留句首大寫習慣；縮寫展開後不改變原文顯示。
-                    if (match === match.toUpperCase()) return expanded.toUpperCase();
-                    if (match[0] === match[0].toUpperCase()) return expanded[0].toUpperCase() + expanded.slice(1);
-                    return expanded;
-                });
-            }
-            return result;
-        }
-
         function speakText(text) {
-            if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
-                showToast("您的瀏覽器不支援語音朗讀", true);
-                return;
-            }
-            const speechText = expandEnglishContractions(text);
-            const chunks = splitSpeechText(speechText);
-            if (!chunks.length) {
-                showToast("沒有可朗讀的英文內容", true);
-                return;
-            }
-            const synth = window.speechSynthesis;
-            const runId = ++speechRunId;
-            synth.cancel();
-            let index = 0;
-            const speakNext = () => {
-                if (runId !== speechRunId || index >= chunks.length) return;
-                const utterance = new SpeechSynthesisUtterance(chunks[index++]);
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-US';
                 utterance.rate = 0.85;
-                utterance.onend = () => {
-                    if (runId === speechRunId) {
-                        if (index < chunks.length) window.setTimeout(speakNext, 120);
-                        else showToast("✅ 朗讀完成");
-                    }
-                };
-                utterance.onerror = (event) => {
-                    if (runId !== speechRunId || event.error === 'canceled' || event.error === 'interrupted') return;
-                    showToast("語音播放中斷，請再按一次播放", true);
-                };
-                synth.speak(utterance);
-            };
-            // 部分 Chrome 在 cancel() 後立刻 speak() 會漏播，延遲啟動較穩定。
-            window.setTimeout(() => {
-                if (runId === speechRunId) speakNext();
-            }, 100);
-            showToast(chunks.length > 1 ? `🔊 正在分段朗讀（${chunks.length} 段）...` : "🔊 正在發音朗讀...");
+                window.speechSynthesis.speak(utterance);
+                showToast("🔊 正在發音朗讀...");
+            } else {
+                showToast("您的瀏覽器不支援語音朗讀", true);
+            }
         }
 
         function copyTextToClipboard(text) {
