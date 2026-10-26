@@ -1330,17 +1330,80 @@
         }
 
         // TTS & Copy Helpers
+        // 將長句拆成較短片段依序朗讀，避免部分瀏覽器遇到長文字時無聲或中途停止。
+        let speechRunId = 0;
+        function splitSpeechText(text, maxLength = 180) {
+            const normalized = String(text || '').replace(/\s+/g, ' ').trim();
+            if (!normalized) return [];
+            const sentences = normalized.match(/[^.!?;:]+[.!?;:]*|[^.!?;:]+$/g) || [normalized];
+            const chunks = [];
+            let current = '';
+            const pushLongPart = (part) => {
+                let rest = part.trim();
+                while (rest.length > maxLength) {
+                    let cut = rest.lastIndexOf(' ', maxLength);
+                    if (cut < Math.floor(maxLength * 0.55)) cut = maxLength;
+                    chunks.push(rest.slice(0, cut).trim());
+                    rest = rest.slice(cut).trim();
+                }
+                if (rest) {
+                    if (current && (current + ' ' + rest).length <= maxLength) current += ' ' + rest;
+                    else {
+                        if (current) chunks.push(current);
+                        current = rest;
+                    }
+                }
+            };
+            for (const sentence of sentences) {
+                const part = sentence.trim();
+                if (!part) continue;
+                if ((current ? current.length + 1 : 0) + part.length <= maxLength) {
+                    current = current ? current + ' ' + part : part;
+                } else {
+                    if (current) { chunks.push(current); current = ''; }
+                    pushLongPart(part);
+                }
+            }
+            if (current) chunks.push(current);
+            return chunks;
+        }
+
         function speakText(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
+            if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+                showToast("您的瀏覽器不支援語音朗讀", true);
+                return;
+            }
+            const chunks = splitSpeechText(text);
+            if (!chunks.length) {
+                showToast("沒有可朗讀的英文內容", true);
+                return;
+            }
+            const synth = window.speechSynthesis;
+            const runId = ++speechRunId;
+            synth.cancel();
+            let index = 0;
+            const speakNext = () => {
+                if (runId !== speechRunId || index >= chunks.length) return;
+                const utterance = new SpeechSynthesisUtterance(chunks[index++]);
                 utterance.lang = 'en-US';
                 utterance.rate = 0.85;
-                window.speechSynthesis.speak(utterance);
-                showToast("🔊 正在發音朗讀...");
-            } else {
-                showToast("您的瀏覽器不支援語音朗讀", true);
-            }
+                utterance.onend = () => {
+                    if (runId === speechRunId) {
+                        if (index < chunks.length) window.setTimeout(speakNext, 120);
+                        else showToast("✅ 朗讀完成");
+                    }
+                };
+                utterance.onerror = (event) => {
+                    if (runId !== speechRunId || event.error === 'canceled' || event.error === 'interrupted') return;
+                    showToast("語音播放中斷，請再按一次播放", true);
+                };
+                synth.speak(utterance);
+            };
+            // 部分 Chrome 在 cancel() 後立刻 speak() 會漏播，延遲啟動較穩定。
+            window.setTimeout(() => {
+                if (runId === speechRunId) speakNext();
+            }, 100);
+            showToast(chunks.length > 1 ? `🔊 正在分段朗讀（${chunks.length} 段）...` : "🔊 正在發音朗讀...");
         }
 
         function copyTextToClipboard(text) {
