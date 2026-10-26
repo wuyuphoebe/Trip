@@ -1311,10 +1311,10 @@
                         "${escapeHtml(p.text)}"
                     </p>
                     <div class="flex items-center gap-2 pt-1">
-                        <button onclick="speakText('${escapeHtml(p.text)}')" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95">
+                        <button onclick="speakText(this.dataset.text)" data-text="${escapeHtml(p.text)}" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95">
                             <i class="fa-solid fa-volume-high"></i> 朗讀聲音
                         </button>
-                        <button onclick="copyTextToClipboard('${escapeHtml(p.text)}')" class="flex-1 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-200 transition-all active:scale-95">
+                        <button onclick="copyTextToClipboard(this.dataset.text)" data-text="${escapeHtml(p.text)}" class="flex-1 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-200 transition-all active:scale-95">
                             <i class="fa-solid fa-copy"></i> 複製文字
                         </button>
                     </div>
