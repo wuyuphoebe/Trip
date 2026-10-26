@@ -114,6 +114,26 @@
             {
               "label": "如果海關繼續問退休前做什麼的話：退休前我在外商當一般職員",
               "text": "I worked as an office staff in a foreign company before I retired."
+            },
+            {
+              "label": "我帶了一些三個月以內的個人自用藥品。我不確定需不需要申報，所以為了保險起見還是先申報了",
+              "text": "I have brought some personal medication for less than 3 months' supply. I wasn't completely sure if they need to be declared, so I decided to declare them just to be safe."
+            },
+            {
+              "label": "問是否有處方箋?",
+              "text": "Do you have a doctor's prescription?"
+            },
+            {
+              "label": "有的，我隨身帶著醫師處方箋",
+              "text": "Yes, I have the doctor's prescription right here."
+            },
+            {
+              "label": "問這是什麼藥",
+              "text": "What kind of medication is this?"
+            },
+            {
+              "label": "這些是我的個人慢性病用藥 / 日常保健品 / 預防感冒與暈車的常用藥。",
+              "text": "They are for my personal chronic conditions / daily supplements / common cold and motion sickness."
             }
           ],
           "attachments": [
@@ -172,13 +192,13 @@
           "time": "15:30",
           "category": "交通",
           "title": "Queenstreet shopping & 銀行辦事",
-          "notes": "去ASB銀行辦事\nHobson Street → ASB Queen Street (走路9分鐘)\n\n景點推薦：\nSky Tower\n聖馬修教堂\nAuckland Art Gallery\nWeta Workshop Unleashed (幫電影《魔戒》做特效裝置的工作室)\n\n吃的喝的推薦：\nThe White Lady 好吃的漢堡\nThai E-Sarn 泰式料理\nHullucat 手搖店\nCoCo 手搖店\n\n紀念品店：\nKiwi Gift",
+          "notes": "去ASB銀行辦事\nHobson Street → ASB Queen Street (走路9分鐘)\n\n景點推薦：\nSky Tower\n聖馬修教堂\nAuckland Art Gallery\nWeta Workshop Unleashed (幫電影《魔戒》做特效裝置的工作室)\n\n吃的喝的推薦：\nThe White Lady 好吃的漢堡\nThai E-Sarn 泰式料理\nHulucat 手搖店\nCoCo 手搖店\n\n紀念品店：\nKiwi Gift",
           "mapQuery": "ASB Queen Street",
           "phrases": [],
           "attachments": [
             {
               "type": "link",
-              "name": "Hullucat",
+              "name": "Hulucat",
               "url": "https://maps.app.goo.gl/MoQqTiG5Hdwuvjt69"
             },
             {
